@@ -1,0 +1,24 @@
+{
+  "name": "Trap",
+  "version": "0.0.1",
+  "description": "Protect against brute force tentatives.",
+  "tags": [
+    "security",
+    "util",
+    "utility"
+  ],
+
+  "author": "Dhumez Sebastien <sebastien.dhumez@gmail.com>",
+  "main": "./lib/trap.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dhumez-Sebastien/trap.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Dhumez-Sebastien/trap.js/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+
+  }
+}

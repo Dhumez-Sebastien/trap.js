@@ -1,2 +1,2 @@
 # trap.js
-Protect user accounts against brute force tentatives
+Protect against brute force tentatives.
