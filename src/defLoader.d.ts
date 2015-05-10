@@ -23,8 +23,10 @@ declare module Trapjs {
     module Protocols {
 
         interface Core {
-            boot():void;
+            allowIP(ip : string) : void;
+            boot(protocolConfig : any, cb : Function) : void;
             getName() : string;
+            loginAttempt(accountID : string, userIP : string, cb : (err ?: any) => void) : void;
         }
 
         interface Local extends Core {
@@ -32,7 +34,7 @@ declare module Trapjs {
         }
 
         interface Redis extends Core {
-            boot():void;
+            boot(redisConfig :IRedisProtocolConfig, cb : Function) : void;
         }
     }
 }

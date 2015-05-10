@@ -58,9 +58,9 @@ var jailConfig = {
     accountLockEnable : true,   // Enables accounts protection
     accountFindTime : 3600,     // Store login attempt on account during 1 hours
     accountLockTime : 600       // Lock account during 10 minutes
-    accountMaxRetry : 25        // 25 connexion attempt before lock account temporary
+    accountMaxRetry : 15        // 15 connexion attempt before lock account temporary
     userFindTime : 3600,        // 1 hour by default
-    userBanTime : 86400         // Ban IP during 1 day
+    userBanTime : 7200          // Ban IP during 2 hours
     userMaxRetry : 10           // 10 connexion attempt before ban user
 };
 

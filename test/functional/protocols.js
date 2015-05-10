@@ -6,7 +6,11 @@ describe('Functional :: Protocols', function () {
         //assert(trapjs.useProtocol({name : 'redis'}) == 'object', 'useProtocol function error : '+trapjs.useProtocol({name : 'redis'}));
 
 
-        trapjs.useProtocol({name : 'redis', port : 6379}, function() {
+        /*trapjs.useProtocol({name : 'redis', port : 6379}, function() {
+            done();
+        });*/
+
+        trapjs.loginAttempt('Seby45', '112.0.0.0', function() {
             done();
         });
     });

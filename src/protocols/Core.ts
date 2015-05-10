@@ -16,6 +16,69 @@ class Core {
     protected _protocolName : string = '';
 
     /**
+     * Time during which the connection attempt stay in memory (in seconds) (3600 by default)
+     *
+     * @property _accountFindTime
+     * @type {number}
+     * @protected
+     */
+    protected _accountFindTime : number = 3600;
+
+    /**
+     * Enable or disable account locking protection (true by default)
+     *
+     * @property _accountLockEnable
+     * @type {boolean}
+     * @protected
+     */
+    protected _accountLockEnable : boolean = true;
+
+    /**
+     * Time during account is locked
+     *
+     * @property _accountLockTime
+     * @type {number}
+     * @protected
+     */
+    protected _accountLockTime : number = 600;
+
+    /**
+     * Number of attempt before lock account (15 by default)
+     *
+     * @property _accountMaxRetry
+     * @type {number}
+     * @protected
+     */
+    protected _accountMaxRetry : number = 15;
+
+    /**
+     * Time during which the connection attempt stay in memory (in seconds) (3600 by default)
+     *
+     * @property _userFindTime
+     * @type {number}
+     * @protected
+     */
+    protected _userFindTime : number = 3600;
+
+    /**
+     * Time during user IP is locked
+     *
+     * @property _userBanTime
+     * @type {number}
+     * @protected
+     */
+    protected _userBanTime : number = 7200;
+
+    /**
+     * Number of attempt before ban user (10 by default)
+     *
+     * @property _userMaxRetry
+     * @type {number}
+     * @protected
+     */
+    protected _userMaxRetry : number = 10;
+
+    /**
      * Add a new IP address in white list
      * @method allowIP
      *
@@ -30,7 +93,7 @@ class Core {
      *
      * @method boot
      */
-    public boot() : void {
+    public boot(protocolConfig : IRedisProtocolConfig, cb : Function) : void {
 
     }
 
@@ -44,12 +107,7 @@ class Core {
         return this._protocolName;
     }
 
-    /**
-     * Load protocol for use
-     *
-     * @method loadProtocol
-     */
-    public loadProtocol() : void {
+    public loginAttempt(accountID : string, userIP : string, cb : (err ?: any) => void) : void {
 
     }
 }

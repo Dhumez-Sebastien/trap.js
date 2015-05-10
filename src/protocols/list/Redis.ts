@@ -5,8 +5,21 @@ import Core = require("./../Core");
 import _ = require("lodash");
 import ioredis = require("ioredis");
 
+/**
+ * Redis
+ *
+ * @module :: Redis
+ * @description	:: Redis protocol.
+ */
 class Redis extends Core implements Trapjs.Protocols.Redis {
 
+    /**
+     * The Redis client
+     *
+     * @property _redis
+     * @type {Trapjs.Protocols.Core[]}
+     * @private
+     */
     private _redis:any;
 
     /**
@@ -20,27 +33,16 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
     }
 
     /**
-     * Init protocol
-     *
-     * @method boot
-     */
-    public boot():void {
-        super.boot();
-    }
-
-    /**
      * Load protocol for use
      *
      * @method loadProtocol
      */
-    public loadProtocol(redisConfig ?:IRedisProtocolConfig, cb ?: () => void):void {
+    public boot(redisConfig : IRedisProtocolConfig, cb : Function) : void {
         // Loading core protocol
-        super.loadProtocol();
+        super.boot(redisConfig, cb);
 
         // Debug
-        console.log('Trying start redis protocol');
-
-        var callback = (cb) ? cb : function() {};
+        console.log('Trapjs :: Protocol <'+this._protocolName+'> trying start');
 
         // Try connect to redis server
         this._redis = new ioredis({
@@ -53,7 +55,7 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
 
         // When client is correctly connected
         this._redis.once('connect', function() {
-            callback();
+            cb();
         });
 
         // Show errors
@@ -61,7 +63,6 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
             console.warn('Redis Protocol error : '+err);
         });
     }
-
 }
 
 // Export Local protocol

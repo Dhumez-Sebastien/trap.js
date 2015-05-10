@@ -13,13 +13,9 @@ var Redis = (function (_super) {
         _super.call(this);
         this._protocolName = 'redis';
     }
-    Redis.prototype.boot = function () {
-        _super.prototype.boot.call(this);
-    };
-    Redis.prototype.loadProtocol = function (redisConfig, cb) {
-        _super.prototype.loadProtocol.call(this);
-        console.log('Trying start redis protocol');
-        var callback = (cb) ? cb : function () { };
+    Redis.prototype.boot = function (redisConfig, cb) {
+        _super.prototype.boot.call(this, redisConfig, cb);
+        console.log('Trapjs :: Protocol <' + this._protocolName + '> trying start');
         this._redis = new ioredis({
             port: (redisConfig && redisConfig.port) ? redisConfig.port : 6379,
             host: (redisConfig && redisConfig.host) ? redisConfig.host : '127.0.0.1',
@@ -28,7 +24,7 @@ var Redis = (function (_super) {
             db: (redisConfig && redisConfig.password) ? redisConfig.password : 0
         });
         this._redis.once('connect', function () {
-            callback();
+            cb();
         });
         this._redis.once('error', function (err) {
             console.warn('Redis Protocol error : ' + err);
