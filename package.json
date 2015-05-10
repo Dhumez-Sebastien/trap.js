@@ -1,15 +1,22 @@
 {
-  "name": "Trap",
-  "version": "0.0.1",
+  "name": "trapjs",
+  "version": "0.0.2",
   "description": "Protect against brute force tentatives.",
   "tags": [
     "security",
     "util",
     "utility"
   ],
-
+  "keywords": [
+    "security",
+    "util",
+    "utility"
+  ],
   "author": "Dhumez Sebastien <sebastien.dhumez@gmail.com>",
   "main": "./lib/trap.js",
+  "scripts": {
+    "test": "mocha"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Dhumez-Sebastien/trap.js.git"
@@ -19,6 +26,11 @@
   },
   "license": "MIT",
   "dependencies": {
-
+    "lodash": "^3.8.0"
+  },
+  "devDependencies": {
+    "assert": "^1.3.0",
+    "chai": "^2.3.0",
+    "mocha": "^2.2.4"
   }
 }
