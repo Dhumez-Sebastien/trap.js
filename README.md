@@ -17,19 +17,36 @@ var trapjs = require('trapjs');
 // Basic login attempt
 trapjs.loginAttempt('accountID', '0.0.0.0', function(err) {
     if (err) {
-        // err.code :: 'E_ACCOUNT_LOCK' :: Account is temporary locked
-        // err.code :: 'E_USER_LOCK' :: User is temporary locked
-        // err.account.lockTime :: 173 :: Time remaining until unlock account
-        // err.user.banTime     :: 125 :: Time remaining until unban
+        // err.code                     :: 'E_ACCOUNT_LOCK' :: Account is temporary locked
+        // err.code                     :: 'E_USER_BAN'     :: User is temporary banned
+        // err.account.lockTime         :: 173 :: Time remaining until unlock account
+        // err.user.banTime             :: 125 :: Time remaining until unban
     } else {
-        // Allow connection request
+        // Begin connection request
+        
+        if (login == 'yourLogin' && password == 'password') {
+            // Your members look's like OK
+        } else {
+            // Add an attempt into Trapjs cause, wrong login/password
+            trapjs.addAttempt('accountID', '0.0.0.0');
+        }
     }
 });
+
+/*
+The "loginAttempt" method check if account and ip are not banned/locked.
+
+DO NOT FORGET TO ADD ATTEMPT WITH "trapjs.addAttempt('accountID', '0.0.0.0');"
+This method will be used to lock account or ban the user if repeated authentication.
+*/
 ```
 
 ## Configure protocols
 
+Actually in dev but Local protocol works correctly
+
 ```javascript
+/*
 // The default protocol used by  Trapjs the "local protocol" but you can define an other (redis for example).
 redisProtocol = {
     protocol : 'redis',
@@ -47,7 +64,7 @@ trapjs.useProtocol(redisProtocol);
 // Schema of local protocol
 localProtocol = {
     protocol : 'local'
-};
+};*/
 ```
 
 ## Configure jails
@@ -78,46 +95,46 @@ trapjs.unbanUser('0, 0, 0, 0');
 trapjs.banUser('0, 0, 0, 0', 3600);
 
 // Unlock account
-trapjs.unlockAccount('accountID');
+//trapjs.unlockAccount('accountID'); -- In dev
 
 // Lock account during time
-trapjs.lockAccount('accountID', 3600);
+//trapjs.lockAccount('accountID', 3600); -- In dev
 
 // Allow IPs for direct login attempt
 trapjs.allowIP(['0, 0, 0, 0', '127.0.0.1']);
 
-// Get the list of users actually banned
-trapjs.getBannedUsers(function(res) {
+// Get the list of users actually banned -- In dev
+/*trapjs.getBannedUsers(function(res) {
     console.log(res);
     
     // res[0].ip        :: 0.0.0.0
     // res[0].banTime   :: 162
-});
+});*/
 
 // Get the list of users
-trapjs.getUsers(function(res) {
+/*trapjs.getUsers(function(res) { -- In dev
     console.log(res);
     
     // res[0].ip        :: 0.0.0.0
     // res[0].retry     :: [199787640000, 199787640010, 199787640030]
     // res[0].unbanTime :: 199787650050
-});
+});*/
 
 // Get the list of accounts actually locked
-trapjs.getLockedAccounts(function(res) {
+/*trapjs.getLockedAccounts(function(res) { -- In dev
     console.log(res);
     
     // res[0].account   :: accountID
     // res[0].lockTime  :: 162
-});
+});*/
 
 // Get the list of accounts
-trapjs.getAccounts(function(res) {
+/*trapjs.getAccounts(function(res) { -- In dev
     console.log(res);
     
     // res[0].account   :: accountID
     // res[0].retry     :: [199787640000, 199787640010, 199787640030]
     // res[0].unlockTime :: 199787650050
-});
+});*/
 
 ```

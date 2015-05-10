@@ -2,6 +2,8 @@
 
 import LogAttempt = require("./LogAttempt");
 import Redis = require("./protocols/list/Redis");
+import fs = require('fs');
+import path = require('path');
 
 /**
  * Trap
@@ -10,15 +12,23 @@ import Redis = require("./protocols/list/Redis");
  * @description	:: The main file of Trapjs.
  */
 class Trap {
-    /**
-     * Contain the list of IP Address who trying connexion
-     */
-    static IPLogList : any = [];
 
     /**
-     * The list of account were the tentative connexion was made
+     * Contains configuration of jails
+     *
+     * @property _jailConfiguration
+     * @type {IJailConfig}
+     * @private
      */
-    static accLogList : any ;
+    private _jailConfiguration : IJailConfig = {
+        accountLockEnable : true,
+        accountFindTime : 3600 * 1000,
+        accountLockTime : 600 * 1000,
+        accountMaxRetry : 15,
+        userFindTime : 3600 * 1000,
+        userBanTime : 7200 * 1000,
+        userMaxRetry : 10
+    };
 
     /**
      * Contains the list of protocols availables as object :: _protocols.redis ; _protocols.local
@@ -61,12 +71,8 @@ class Trap {
      *
      */
     constructor() {
-        // Load Protocols available
-        console.log('Loading protocols');
-
-        var fs = require('fs')
-            , path = require('path')
-            , self : Trap = this;
+        //Scope
+        var self : Trap = this;
 
         // Extract the list of protocols availables
         fs.readdir(__dirname+'/protocols/list/', function(err, files) {
@@ -107,11 +113,11 @@ class Trap {
      * @param filename {string}         Filename of protocol
      */
     private _loadProtocol(filename : string) : void {
-        console.log('Loading protocol : '+filename);
+        //console.log('Trapjs :: Loading protocol : '+filename);
 
         // Load protocol from files
         var protocol = require(__dirname+'/protocols/list/'+filename),
-            build = new protocol();
+            build = new protocol(this._jailConfiguration);
 
         // Add protocol in list
         this._protocols[build.getName()] = build;
@@ -122,17 +128,58 @@ class Trap {
         }
     }
 
-    public allowIP(userIP : string[]) : void {
-
+    /**
+     * Add a new connection attempt
+     * @method addAttempt
+     *
+     * @param accountID {string}    Account ID for auth
+     * @param userIP {string}       User IP for auth
+     */
+    public addAttempt(accountID : string, userIP : string) : Trap {
+        this._protocolUsed.addAttempt(accountID, userIP);
+        return this;
     }
 
-
-    public banUser(userIP : string, time ?: number) : void {
-
+    /**
+     * Add a new IP address or a list of IP address in white list
+     * @method allowIP
+     *
+     * @param ip {string}       IP address of user allowed
+     * @return {boolean}        Return true if an IP address is added or false if no one is added
+     */
+    public allowIP(ip : string|string[]|any) : boolean {
+        if (_.isArray(ip)) {
+            var back : boolean = false;
+            for (var i : number = 0, ls : number = ip.length; i < ls; i++) {
+                if (this._protocolUsed.allowIP(ip[i])) {
+                    back = true;
+                }
+            }
+            return back;
+        } else {
+            return this._protocolUsed.allowIP(ip);
+        }
     }
 
+    /**
+     * Ban user manually
+     * @method banUser
+     *
+     * @param ip {string}       IP address of user
+     * @param time {number}     Optional ban time in seconds
+     */
+    public banUser(ip : string, time ?: number) : void {
+        this._protocolUsed.banUser(ip, time);
+    }
 
-    public configJail(jailConfiguration : any) : Trap {
+    /**
+     * Update configuration of Jails
+     * @method configJail
+     *
+     * @param jailConfiguration {IJailConfig}   New jail configuration
+     */
+    public configJail(jailConfiguration : IJailConfig) : Trap {
+        this._protocolUsed.configJail(jailConfiguration);
         return this;
     }
 
@@ -140,13 +187,22 @@ class Trap {
         return [];
     }
 
-
     public getBannedUsers() : any[] {
         return [];
     }
 
     public getLockedAccounts() : any[] {
         return [];
+    }
+
+    /**
+     * Get the name of protocol used actually
+     * @method getProtocolName
+     *
+     * @return string       The name of protocol
+     */
+    public getProtocolName() : string {
+        return this._protocolUsed.getName();
     }
 
 
@@ -164,12 +220,17 @@ class Trap {
 
     public loginAttempt(accountID : string, userIP : string, cb : (err : any) => void) : Trap {
         this._protocolUsed.loginAttempt(accountID, userIP, cb);
-
         return this;
     }
 
+    /**
+     * Unban user manually
+     * @method unbanUser
+     *
+     * @param userIP {string}       IP of user who must be unbanned
+     */
     public unbanUser(userIP : string) : void {
-
+        this._protocolUsed.unbanUser(userIP);
     }
 
     public unlockAccount(accountID : string) : void {
@@ -192,7 +253,7 @@ class Trap {
                 this._protocolUsed = this._protocols[protocol.name];
 
                 // Debug
-                console.log('Trapjs :: Use protocol : ' + protocol.name);
+                //console.log('Trapjs :: Use protocol : ' + protocol.name);
 
                 // Init protocol
                 this._protocolUsed.boot(protocol, function() {
@@ -201,7 +262,7 @@ class Trap {
                         cb();
                     }
 
-                    console.log('Trapjs :: Protocol '+protocol.name+' is init with success');
+                    //console.log('Trapjs :: Protocol '+protocol.name+' is init with success');
                 });
             } else {
                 console.error('Trapjs :: Protocol no found : ' + protocol.name);
@@ -210,7 +271,7 @@ class Trap {
             // Scope
             var self : Trap = this;
 
-            console.log('Trapjs :: Add useProtocol callback in waiting');
+            //console.log('Trapjs :: Add useProtocol callback in waiting');
 
             // Push function in waiting list
             this._waintingCallback.push(function() {
@@ -219,46 +280,6 @@ class Trap {
         }
 
         return this;
-    }
-
-
-    /**
-     * Check how much an account receive a connection attempt and blocks him where brute force
-     * @param accountLogin                  The account login checked
-     */
-    static checkAccountAttempt(accountLogin : string) : boolean {
-
-        // Get account name
-        var accLog : string = accountLogin.toLowerCase();
-
-        // Check if account is in memory
-        if (!this.accLogList[accLog]) {
-            this.accLogList[accLog] = new LogAttempt();
-        }
-
-        // For DEBUG
-        console.log('Account login attempt : '+accountLogin+" | Number of Attempt : "+this.accLogList[accLog].getAttempt()+" | Account locked : "+this.accLogList[accLog].getLocked());
-
-        // Get back the result of login attempt
-        return !this.accLogList[accLog].isLocked();
-    }
-
-    /**
-     * Check how much attempt an user send try connect to an account and block him where brute force tentative
-     * @param userIP                        The user IP checked
-     */
-    static checkUserAttempt(userIP : string) : boolean {
-
-        // Check if IP is in memory
-        if (!this.IPLogList[userIP]) {
-            this.IPLogList[userIP] = new LogAttempt();
-        }
-
-        // For DEBUG
-        console.log('IP try connect attempt | IP : '+userIP+" | Number of Attempt : "+this.IPLogList[userIP].getAttempt()+" | IP locked : "+this.IPLogList[userIP].getLocked());
-
-        // Get back the result of login attempt
-        return !this.IPLogList[userIP].isLocked();
     }
 }
 

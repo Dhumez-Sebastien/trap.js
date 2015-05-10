@@ -5,6 +5,8 @@
 /**
  * Def
  */
+///<reference path="./def/IJailConfig.d.ts" />
+///<reference path="./def/ILocalProtocolUser.d.ts" />
 ///<reference path="./def/IRedisProtocolConfig.d.ts" />
 
 /**
@@ -23,14 +25,18 @@ declare module Trapjs {
     module Protocols {
 
         interface Core {
-            allowIP(ip : string) : void;
+            addAttempt(accountID : string, userIP : string) : void;
+            allowIP(ip : string) : boolean;
+            banUser(ip : string, time ?: number) : void;
             boot(protocolConfig : any, cb : Function) : void;
+            configJail(jailConfig : IJailConfig) : void;
             getName() : string;
             loginAttempt(accountID : string, userIP : string, cb : (err ?: any) => void) : void;
+            unbanUser(ip : string) : void;
         }
 
         interface Local extends Core {
-            boot():void;
+
         }
 
         interface Redis extends Core {

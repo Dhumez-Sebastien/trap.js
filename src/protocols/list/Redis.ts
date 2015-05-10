@@ -24,12 +24,25 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
 
     /**
      * Basic constructor
+     *
+     * @param jailConfig {IJailConfig}      Jail configuration
      */
-    public constructor() {
-        super();
+    public constructor(jailConfig : IJailConfig) {
+        super(jailConfig);
 
         // Init name of protocol
         this._protocolName = 'redis';
+    }
+
+    /**
+     * Add a new IP address in white list
+     * @method allowIP
+     *
+     * @param ip {string}       IP address of user allowed
+     * @return {boolean}        Return true if IP is added or false is she's already in DB
+     */
+    public allowIP(ip : string) : boolean {
+        return false;
     }
 
     /**
@@ -38,9 +51,6 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
      * @method loadProtocol
      */
     public boot(redisConfig : IRedisProtocolConfig, cb : Function) : void {
-        // Loading core protocol
-        super.boot(redisConfig, cb);
-
         // Debug
         console.log('Trapjs :: Protocol <'+this._protocolName+'> trying start');
 

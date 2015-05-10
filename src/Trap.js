@@ -1,12 +1,20 @@
 ///<reference path="./defLoader.d.ts" />
-var LogAttempt = require("./LogAttempt");
+var fs = require('fs');
 var Trap = (function () {
     function Trap() {
+        this._jailConfiguration = {
+            accountLockEnable: true,
+            accountFindTime: 3600 * 1000,
+            accountLockTime: 600 * 1000,
+            accountMaxRetry: 15,
+            userFindTime: 3600 * 1000,
+            userBanTime: 7200 * 1000,
+            userMaxRetry: 10
+        };
         this._protocols = [];
         this._ready = false;
         this._waintingCallback = [];
-        console.log('Loading protocols');
-        var fs = require('fs'), path = require('path'), self = this;
+        var self = this;
         fs.readdir(__dirname + '/protocols/list/', function (err, files) {
             var protocolCount = files.filter(function (file) { return file.substr(-3) === '.js'; }).length;
             files.filter(function (file) { return file.substr(-3) === '.js'; })
@@ -26,18 +34,36 @@ var Trap = (function () {
         }
     };
     Trap.prototype._loadProtocol = function (filename) {
-        console.log('Loading protocol : ' + filename);
-        var protocol = require(__dirname + '/protocols/list/' + filename), build = new protocol();
+        //console.log('Trapjs :: Loading protocol : '+filename);
+        var protocol = require(__dirname + '/protocols/list/' + filename), build = new protocol(this._jailConfiguration);
         this._protocols[build.getName()] = build;
         if (!this._protocolUsed && build.getName() === 'local') {
             this.useProtocol({ name: 'local' });
         }
     };
-    Trap.prototype.allowIP = function (userIP) {
+    Trap.prototype.addAttempt = function (accountID, userIP) {
+        this._protocolUsed.addAttempt(accountID, userIP);
+        return this;
     };
-    Trap.prototype.banUser = function (userIP, time) {
+    Trap.prototype.allowIP = function (ip) {
+        if (_.isArray(ip)) {
+            var back = false;
+            for (var i = 0, ls = ip.length; i < ls; i++) {
+                if (this._protocolUsed.allowIP(ip[i])) {
+                    back = true;
+                }
+            }
+            return back;
+        }
+        else {
+            return this._protocolUsed.allowIP(ip);
+        }
+    };
+    Trap.prototype.banUser = function (ip, time) {
+        this._protocolUsed.banUser(ip, time);
     };
     Trap.prototype.configJail = function (jailConfiguration) {
+        this._protocolUsed.configJail(jailConfiguration);
         return this;
     };
     Trap.prototype.getAccounts = function () {
@@ -48,6 +74,9 @@ var Trap = (function () {
     };
     Trap.prototype.getLockedAccounts = function () {
         return [];
+    };
+    Trap.prototype.getProtocolName = function () {
+        return this._protocolUsed.getName();
     };
     Trap.prototype.getUsers = function () {
         return [];
@@ -61,6 +90,7 @@ var Trap = (function () {
         return this;
     };
     Trap.prototype.unbanUser = function (userIP) {
+        this._protocolUsed.unbanUser(userIP);
     };
     Trap.prototype.unlockAccount = function (accountID) {
     };
@@ -68,12 +98,10 @@ var Trap = (function () {
         if (this._ready || this._protocols[protocol.name]) {
             if (this._protocols[protocol.name]) {
                 this._protocolUsed = this._protocols[protocol.name];
-                console.log('Trapjs :: Use protocol : ' + protocol.name);
                 this._protocolUsed.boot(protocol, function () {
                     if (cb) {
                         cb();
                     }
-                    console.log('Trapjs :: Protocol ' + protocol.name + ' is init with success');
                 });
             }
             else {
@@ -82,29 +110,12 @@ var Trap = (function () {
         }
         else {
             var self = this;
-            console.log('Trapjs :: Add useProtocol callback in waiting');
             this._waintingCallback.push(function () {
                 self.useProtocol(protocol, cb);
             });
         }
         return this;
     };
-    Trap.checkAccountAttempt = function (accountLogin) {
-        var accLog = accountLogin.toLowerCase();
-        if (!this.accLogList[accLog]) {
-            this.accLogList[accLog] = new LogAttempt();
-        }
-        console.log('Account login attempt : ' + accountLogin + " | Number of Attempt : " + this.accLogList[accLog].getAttempt() + " | Account locked : " + this.accLogList[accLog].getLocked());
-        return !this.accLogList[accLog].isLocked();
-    };
-    Trap.checkUserAttempt = function (userIP) {
-        if (!this.IPLogList[userIP]) {
-            this.IPLogList[userIP] = new LogAttempt();
-        }
-        console.log('IP try connect attempt | IP : ' + userIP + " | Number of Attempt : " + this.IPLogList[userIP].getAttempt() + " | IP locked : " + this.IPLogList[userIP].getLocked());
-        return !this.IPLogList[userIP].isLocked();
-    };
-    Trap.IPLogList = [];
     return Trap;
 })();
 module.exports = new Trap();

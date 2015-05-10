@@ -9,18 +9,24 @@ var Core = require("./../Core");
 var _ = require("lodash");
 var Local = (function (_super) {
     __extends(Local, _super);
-    function Local() {
-        _super.call(this);
-        this._accountList = [];
+    function Local(jailConfig) {
+        _super.call(this, jailConfig);
         this._accountAttempts = [];
-        this._userList = [];
+        this._accountJail = [];
+        this._accountJailInfo = [];
+        this._accountList = [];
         this._userAttempts = [];
+        this._userJail = [];
+        this._userJailInfo = {};
+        this._userList = [];
         this._IPWhiteList = [];
         this._protocolName = 'local';
     }
+    Local.prototype._accountIsLocked = function (accountID) {
+        return _.indexOf(this._accountJail, accountID) != -1;
+    };
     Local.prototype._clearQueue = function () {
-        console.log('Clear queue');
-        var userFindTime = Date.now() - (this._userFindTime * 1000);
+        var userFindTime = Date.now() - this._userFindTime;
         for (var i = 0, ls = this._userAttempts.length; i < ls; i++) {
             if (this._userList[this._userAttempts[i]].attempts[0].date < userFindTime) {
                 this._userList[this._userAttempts[i]].attempts.shift();
@@ -35,7 +41,7 @@ var Local = (function (_super) {
                 break;
             }
         }
-        var accountFindTime = Date.now() - (this._accountFindTime * 1000);
+        var accountFindTime = Date.now() - this._accountFindTime;
         for (var i = 0, ls = this._accountAttempts.length; i < ls; i++) {
             if (this._accountList[this._accountAttempts[i]].attempts[0].date < accountFindTime) {
                 this._accountList[this._accountAttempts[i]].attempts.shift();
@@ -50,38 +56,53 @@ var Local = (function (_super) {
                 break;
             }
         }
+        for (var i = 0, ls = this._userJail.length; i < ls; i++) {
+            if (this._userJailInfo[this._userJail[i]].endBan < Date.now()) {
+                delete (this._userJailInfo[this._userJail[i]]);
+                this._userJail.splice(i, 1);
+                i--;
+                ls--;
+            }
+        }
+        for (var i = 0, ls = this._accountJail.length; i < ls; i++) {
+            if (this._accountJailInfo[this._accountJail[i]].endLock < Date.now()) {
+                delete (this._accountJailInfo[this._accountJail[i]]);
+                this._accountJail.splice(i, 1);
+                i--;
+                ls--;
+            }
+        }
     };
     Local.prototype._userIsAllowed = function (ip) {
         return _.indexOf(this._IPWhiteList, ip) > -1;
     };
-    Local.prototype.allowIP = function (ip) {
-        if (_.indexOf(this._IPWhiteList, ip) == -1) {
-            this._IPWhiteList.push(ip);
-            return true;
-        }
-        return false;
+    Local.prototype._userIsBanned = function (ip) {
+        return _.indexOf(this._userJail, ip) != -1;
     };
-    Local.prototype.boot = function (protocolConfig, cb) {
-    };
-    Local.prototype.loginAttempt = function (accountID, userIP, cb) {
-        console.log('Trapjs :: Protocol local :: Login attempt');
-        this._clearQueue();
-        if (this._userIsAllowed(userIP)) {
-            cb();
+    Local.prototype.addAttempt = function (accountID, userIP) {
+        _super.prototype.addAttempt.call(this, accountID, userIP);
+        if (this._userIsBanned(userIP) || (this._accountLockEnable && this._accountIsLocked(accountID))) {
+            return;
         }
-        else {
-            if (_.indexOf(this._userList, userIP) == -1) {
-                this._userList[userIP] = {
-                    banTimestamp: 0,
-                    attempts: []
-                };
-            }
-            this._userList[userIP].attempts.push({
-                account: accountID,
-                date: Date.now()
-            });
-            this._userAttempts.push(userIP);
-            if (_.indexOf(this._accountList, accountID) == -1) {
+        if (!this._userList[userIP]) {
+            this._userList[userIP] = {
+                banTimestamp: 0,
+                attempts: []
+            };
+        }
+        this._userList[userIP].attempts.push({
+            account: accountID,
+            date: Date.now()
+        });
+        this._userAttempts.push(userIP);
+        if (this._userList[userIP].attempts.length >= this._userMaxRetry) {
+            this._userJail.push(userIP);
+            this._userJailInfo[userIP] = {
+                endBan: Date.now() + this._userBanTime
+            };
+        }
+        if (this._accountLockEnable) {
+            if (!this._accountList[accountID]) {
                 this._accountList[accountID] = {
                     lockTimestamp: 0,
                     attempts: []
@@ -92,7 +113,57 @@ var Local = (function (_super) {
                 date: Date.now()
             });
             this._accountAttempts.push(accountID);
+            if (this._accountList[accountID].attempts.length >= this._accountMaxRetry) {
+                this._accountJail.push(accountID);
+                this._accountJailInfo[accountID] = {
+                    endLock: Date.now() + this._accountLockTime
+                };
+            }
+        }
+    };
+    Local.prototype.allowIP = function (ip) {
+        if (_.indexOf(this._IPWhiteList, ip) == -1) {
+            this._IPWhiteList.push(ip);
+            return true;
+        }
+        return false;
+    };
+    Local.prototype.banUser = function (ip, time) {
+        var customTime = (time) ? time * 1000 : this._userBanTime;
+        if (this._userIsBanned(ip)) {
+            this._userJailInfo[ip].endBan = Date.now() + customTime;
+        }
+        else {
+            this._userJail.push(ip);
+            this._userJailInfo[ip] = {
+                endBan: Date.now() + customTime
+            };
+        }
+    };
+    Local.prototype.loginAttempt = function (accountID, userIP, cb) {
+        // Debug
+        //console.log('Trapjs :: Protocol local :: Login attempt');
+        this._clearQueue();
+        if (this._userIsAllowed(userIP)) {
             cb();
+        }
+        else if (this._userIsBanned(userIP)) {
+            cb({
+                code: 'E_USER_BAN',
+                user: {
+                    banTime: (this._userJailInfo[userIP].endBan - Date.now()) / 1000
+                }
+            });
+        }
+        else {
+            cb();
+        }
+    };
+    Local.prototype.unbanUser = function (ip) {
+        var userIndex = _.indexOf(this._userJail, ip);
+        if (userIndex != -1) {
+            delete (this._userJailInfo[ip]);
+            this._userJail.splice(userIndex, 1);
         }
     };
     return Local;

@@ -9,12 +9,14 @@ var Core = require("./../Core");
 var ioredis = require("ioredis");
 var Redis = (function (_super) {
     __extends(Redis, _super);
-    function Redis() {
-        _super.call(this);
+    function Redis(jailConfig) {
+        _super.call(this, jailConfig);
         this._protocolName = 'redis';
     }
+    Redis.prototype.allowIP = function (ip) {
+        return false;
+    };
     Redis.prototype.boot = function (redisConfig, cb) {
-        _super.prototype.boot.call(this, redisConfig, cb);
         console.log('Trapjs :: Protocol <' + this._protocolName + '> trying start');
         this._redis = new ioredis({
             port: (redisConfig && redisConfig.port) ? redisConfig.port : 6379,

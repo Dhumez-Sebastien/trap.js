@@ -22,7 +22,7 @@ class Core {
      * @type {number}
      * @protected
      */
-    protected _accountFindTime : number = 3600;
+    protected _accountFindTime : number;
 
     /**
      * Enable or disable account locking protection (true by default)
@@ -40,7 +40,7 @@ class Core {
      * @type {number}
      * @protected
      */
-    protected _accountLockTime : number = 600;
+    protected _accountLockTime : number;
 
     /**
      * Number of attempt before lock account (15 by default)
@@ -49,7 +49,7 @@ class Core {
      * @type {number}
      * @protected
      */
-    protected _accountMaxRetry : number = 15;
+    protected _accountMaxRetry : number;
 
     /**
      * Time during which the connection attempt stay in memory (in seconds) (3600 by default)
@@ -58,7 +58,7 @@ class Core {
      * @type {number}
      * @protected
      */
-    protected _userFindTime : number = 3600;
+    protected _userFindTime : number;
 
     /**
      * Time during user IP is locked
@@ -67,7 +67,7 @@ class Core {
      * @type {number}
      * @protected
      */
-    protected _userBanTime : number = 7200;
+    protected _userBanTime : number;
 
     /**
      * Number of attempt before ban user (10 by default)
@@ -76,15 +76,57 @@ class Core {
      * @type {number}
      * @protected
      */
-    protected _userMaxRetry : number = 10;
+    protected _userMaxRetry : number;
+
+    /**
+     * Basic constructor
+     *
+     * @param jailConfig {IJailConfig}      Jail configuration
+     */
+    public constructor(jailConfig : IJailConfig) {
+        if (jailConfig) {
+            // Account
+            this._accountFindTime = (jailConfig.accountFindTime) ? jailConfig.accountFindTime : 3600 * 1000;
+            this._accountLockEnable = (jailConfig.accountLockEnable == true);
+            this._accountLockTime = (jailConfig.accountLockTime) ? jailConfig.accountLockTime : 600 * 1000;
+            this._accountMaxRetry = (jailConfig.accountMaxRetry) ? jailConfig.accountMaxRetry : 15;
+
+            // User
+            this._userFindTime = (jailConfig.userFindTime) ? jailConfig.userFindTime : 3600 * 1000;
+            this._userBanTime = (jailConfig.userBanTime) ? jailConfig.userBanTime : 7200 * 1000;
+            this._userMaxRetry = (jailConfig.userMaxRetry) ? jailConfig.userMaxRetry : 10;
+        }
+    }
+
+    /**
+     * Add a new connection attempt
+     * @method addAttempt
+     *
+     * @param accountID {string}    Account ID for auth
+     * @param userIP {string}       User IP for auth
+     */
+    public addAttempt(accountID : string, userIP : string) : void {
+
+    }
 
     /**
      * Add a new IP address in white list
      * @method allowIP
      *
-     * @param ip {string}       IP adress of user allowed
+     * @param ip {string}       IP address of user allowed
      */
     public allowIP(ip : string) : void {
+
+    }
+
+    /**
+     * Ban user manually
+     * @method banUser
+     *
+     * @param ip {string}       IP address of user
+     * @param time {number}     Optional ban time in seconds
+     */
+    public banUser(ip : string, time ?: number) : void {
 
     }
 
@@ -94,7 +136,47 @@ class Core {
      * @method boot
      */
     public boot(protocolConfig : IRedisProtocolConfig, cb : Function) : void {
+        cb();
+    }
 
+    /**
+     * Update jails configuration
+     *
+     * @method configJail
+     * @param jailConfig {IJailConfig}      Jail configuration
+     */
+    public configJail(jailConfig : IJailConfig) : void {
+        if (jailConfig) {
+            // Account
+            if (jailConfig.accountFindTime) {
+                this._accountFindTime = jailConfig.accountFindTime * 1000;
+            }
+
+            if (jailConfig.accountLockEnable != void 0) {
+                this._accountLockEnable = !!jailConfig.accountLockEnable;
+            }
+
+            if (jailConfig.accountLockTime) {
+                this._accountLockTime = jailConfig.accountLockTime * 1000;
+            }
+
+            if (jailConfig.accountMaxRetry) {
+                this._accountMaxRetry = jailConfig.accountMaxRetry;
+            }
+
+            // User
+            if (jailConfig.userFindTime) {
+                this._userFindTime = jailConfig.userFindTime * 1000;
+            }
+
+            if (jailConfig.userBanTime) {
+                this._userBanTime = jailConfig.userBanTime * 1000;
+            }
+
+            if (jailConfig.userMaxRetry) {
+                this._userMaxRetry = jailConfig.userMaxRetry;
+            }
+        }
     }
 
     /**
@@ -108,6 +190,16 @@ class Core {
     }
 
     public loginAttempt(accountID : string, userIP : string, cb : (err ?: any) => void) : void {
+
+    }
+
+    /**
+     * Unban user manually
+     * @method unbanUser
+     *
+     * @param userIP {string}       IP of user who must be unbanned
+     */
+    public unbanUser(userIP : string) : void {
 
     }
 }
