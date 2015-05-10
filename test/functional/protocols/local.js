@@ -2,7 +2,7 @@
 
 describe('Functional :: Protocols :: Local', function () {
     it('should use *local* Trapjs protocol', function(done) {
-        trapjs.useProtocol({name : 'local'}, function() {
+        trapjs.useProtocol({protocol : 'local'}, function() {
             done();
         });
         assert(trapjs.getProtocolName() == 'local', 'error must get local but  : '+trapjs.getProtocolName());

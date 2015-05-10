@@ -38,7 +38,7 @@ var Trap = (function () {
         var protocol = require(__dirname + '/protocols/list/' + filename), build = new protocol(this._jailConfiguration);
         this._protocols[build.getName()] = build;
         if (!this._protocolUsed && build.getName() === 'local') {
-            this.useProtocol({ name: 'local' });
+            this.useProtocol({ protocol: 'local' });
         }
     };
     Trap.prototype.addAttempt = function (accountID, userIP) {
@@ -95,9 +95,9 @@ var Trap = (function () {
     Trap.prototype.unlockAccount = function (accountID) {
     };
     Trap.prototype.useProtocol = function (protocol, cb) {
-        if (this._ready || this._protocols[protocol.name]) {
-            if (this._protocols[protocol.name]) {
-                this._protocolUsed = this._protocols[protocol.name];
+        if (this._ready || this._protocols[protocol.protocol]) {
+            if (this._protocols[protocol.protocol]) {
+                this._protocolUsed = this._protocols[protocol.protocol];
                 this._protocolUsed.boot(protocol, function () {
                     if (cb) {
                         cb();
@@ -105,7 +105,7 @@ var Trap = (function () {
                 });
             }
             else {
-                console.error('Trapjs :: Protocol no found : ' + protocol.name);
+                console.error('Trapjs :: Protocol no found : ' + protocol.protocol);
             }
         }
         else {

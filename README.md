@@ -138,3 +138,24 @@ trapjs.allowIP(['0, 0, 0, 0', '127.0.0.1']);
 });*/
 
 ```
+
+# Running tests
+
+Start a Redis server on 127.0.0.1:6379, and then:
+
+```shell
+$ npm test
+```
+
+`FLUSH ALL` will be invoked after each test, so make sure there's no valuable data in it before running tests.
+
+# Join in!
+
+I'm happy to receive bug reports, fixes, documentation enhancements, and any other improvements.
+
+And since I'm not an English native speaker (i'm French :p) so if you find any grammar mistake in the documentation, please also let me know. :)
+
+# RoadMap
+
+* Finish correctly Local protocol
+* Implements Redis protocol (with ioredis)
