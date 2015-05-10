@@ -124,7 +124,7 @@ class Trap {
 
         // Select local protocol by default
         if (!this._protocolUsed && build.getName() === 'local') {
-            this.useProtocol({name : 'local'});
+            this.useProtocol({protocol : 'local'});
         }
     }
 
@@ -246,11 +246,11 @@ class Trap {
      */
     public useProtocol(protocol : any, cb ?: Function) : Trap {
         // Check if Trapjs is ready ofr use
-        if (this._ready || this._protocols[protocol.name]) {
+        if (this._ready || this._protocols[protocol.protocol]) {
             // Check if protocol is available
-            if (this._protocols[protocol.name]) {
+            if (this._protocols[protocol.protocol]) {
                 // Assign protocol
-                this._protocolUsed = this._protocols[protocol.name];
+                this._protocolUsed = this._protocols[protocol.protocol];
 
                 // Debug
                 //console.log('Trapjs :: Use protocol : ' + protocol.name);
@@ -265,7 +265,7 @@ class Trap {
                     //console.log('Trapjs :: Protocol '+protocol.name+' is init with success');
                 });
             } else {
-                console.error('Trapjs :: Protocol no found : ' + protocol.name);
+                console.error('Trapjs :: Protocol no found : ' + protocol.protocol);
             }
         } else {
             // Scope
