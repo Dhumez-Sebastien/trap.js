@@ -1,5 +1,5 @@
 # trap.js
-#### Protect your app against brute force tentatives.
+#### Protect your Node.js app against brute force tentatives.
 
 More and more Node.js applications are victims of brute-force attack if you have an authentication space. Trap.js was designed to lock those users.
 

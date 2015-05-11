@@ -1,7 +1,7 @@
 {
   "name": "trapjs",
   "version": "0.1.0",
-  "description": "Protect against brute force tentatives.",
+  "description": "Protect your Node.js app against brute force tentatives.",
   "tags": [
     "security",
     "util",
