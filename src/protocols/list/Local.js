@@ -17,7 +17,7 @@ var Local = (function (_super) {
         this._accountList = [];
         this._userAttempts = [];
         this._userJail = [];
-        this._userJailInfo = {};
+        this._userJailInfo = [];
         this._userList = [];
         this._IPWhiteList = [];
         this._protocolName = 'local';
@@ -140,6 +140,22 @@ var Local = (function (_super) {
             };
         }
     };
+    Local.prototype.lockAccount = function (accountID, time) {
+        if (!this._accountLockEnable) {
+            console.log('Trapjs :: You try lock manually account but system is currently off (jailConfig.accountLockEnable = false)');
+            return;
+        }
+        var customTime = (time) ? time * 1000 : this._accountLockTime;
+        if (this._accountIsLocked(accountID)) {
+            this._accountJailInfo[accountID].endLock = Date.now() + customTime;
+        }
+        else {
+            this._accountJail.push(accountID);
+            this._accountJailInfo[accountID] = {
+                endLock: Date.now() + customTime
+            };
+        }
+    };
     Local.prototype.loginAttempt = function (accountID, userIP, cb) {
         // Debug
         //console.log('Trapjs :: Protocol local :: Login attempt');
@@ -155,6 +171,14 @@ var Local = (function (_super) {
                 }
             });
         }
+        else if (this._accountLockEnable && this._accountIsLocked(accountID)) {
+            cb({
+                code: 'E_ACCOUNT_LOCK',
+                account: {
+                    lockTime: (this._accountJailInfo[accountID].endLock - Date.now()) / 1000
+                }
+            });
+        }
         else {
             cb();
         }
@@ -164,6 +188,36 @@ var Local = (function (_super) {
         if (userIndex != -1) {
             delete (this._userJailInfo[ip]);
             this._userJail.splice(userIndex, 1);
+            if (this._userList[ip]) {
+                while (this._userList[ip].attempts.length > 0) {
+                    this._userList[ip].attempts.pop();
+                }
+                delete (this._userList[ip]);
+            }
+            while (_.indexOf(this._userAttempts, ip) != -1) {
+                var index = (_.indexOf(this._userAttempts, ip));
+                this._userAttempts.splice(index, 1);
+            }
+        }
+    };
+    Local.prototype.unlockAccount = function (accountID) {
+        if (!this._accountLockEnable) {
+            return;
+        }
+        var accountIndex = _.indexOf(this._accountJail, accountID);
+        if (accountIndex != -1) {
+            delete (this._accountJailInfo[accountID]);
+            this._accountJail.splice(accountIndex, 1);
+            if (this._accountList[accountID]) {
+                while (this._accountList[accountID].attempts.length > 0) {
+                    this._accountList[accountID].attempts.pop();
+                }
+                delete (this._accountList[accountID]);
+            }
+            while (_.indexOf(this._accountAttempts, accountID) != -1) {
+                var index = (_.indexOf(this._accountAttempts, accountID));
+                this._accountAttempts.splice(index, 1);
+            }
         }
     };
     return Local;

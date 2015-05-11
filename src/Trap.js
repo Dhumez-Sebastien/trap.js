@@ -84,15 +84,17 @@ var Trap = (function () {
     Trap.prototype.injectProtocols = function () {
     };
     Trap.prototype.lockAccount = function (accountID, time) {
+        this._protocolUsed.lockAccount(accountID, time);
     };
-    Trap.prototype.loginAttempt = function (accountID, userIP, cb) {
-        this._protocolUsed.loginAttempt(accountID, userIP, cb);
+    Trap.prototype.loginAttempt = function (accountID, ip, cb) {
+        this._protocolUsed.loginAttempt(accountID, ip, cb);
         return this;
     };
     Trap.prototype.unbanUser = function (userIP) {
         this._protocolUsed.unbanUser(userIP);
     };
     Trap.prototype.unlockAccount = function (accountID) {
+        this._protocolUsed.unlockAccount(accountID);
     };
     Trap.prototype.useProtocol = function (protocol, cb) {
         if (this._ready || this._protocols[protocol.protocol]) {

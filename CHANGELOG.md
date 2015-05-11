@@ -1,5 +1,9 @@
 ## Change Log
 
+### 
+- Local Protocol :: Add lockAccount/unlockAccount method
+- Local Protocol :: Lock account if too many connection attempts have been sent on
+
 ### v0.0.5 (2015/05/10)
 - Implement Local protocol
 - Begin functional/unit test with mocha

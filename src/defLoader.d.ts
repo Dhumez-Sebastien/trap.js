@@ -5,9 +5,11 @@
 /**
  * Def
  */
+///<reference path="./def/IAccountJailInfo.d.ts" />
 ///<reference path="./def/IJailConfig.d.ts" />
 ///<reference path="./def/ILocalProtocolUser.d.ts" />
 ///<reference path="./def/IRedisProtocolConfig.d.ts" />
+///<reference path="./def/IUserJailInfo.d.ts" />
 
 /**
  * Protocols
@@ -16,7 +18,6 @@
 ///<reference path="./protocols/list/Local.ts" />
 ///<reference path="./protocols/list/Redis.ts" />
 
-///<reference path="./Protocols.ts" />
 ///<reference path="./Trap.ts" />
 
 
@@ -30,8 +31,10 @@ declare module Trapjs {
             boot(protocolConfig : any, cb : Function) : void;
             configJail(jailConfig : IJailConfig) : void;
             getName() : string;
+            lockAccount(accountID : string, time ?: number) : void;
             loginAttempt(accountID : string, userIP : string, cb : (err ?: any) => void) : void;
             unbanUser(ip : string) : void;
+            unlockAccount(accountID : string) : void;
         }
 
         interface Local extends Core {

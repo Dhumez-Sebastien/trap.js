@@ -40,10 +40,10 @@ class Local extends Core {
      * Contain information about account actually banned
      *
      * @property _accountJailInfo
-     * @type {any[]}
+     * @type {IAccountJailInfo[]}
      * @private
      */
-    private _accountJailInfo : string[] = [];
+    private _accountJailInfo : IAccountJailInfo[] = [];
 
     /**
      * Contains a list of accounts that have been used for connection
@@ -82,10 +82,10 @@ class Local extends Core {
      * Contain information about user actually banned
      *
      * @property _userJailInfo
-     * @type {any[]}
+     * @type {IUserJailInfo[]}
      * @private
      */
-    private _userJailInfo : any = {};
+    private _userJailInfo : IUserJailInfo[] = [];
 
     /**
      * Contain the list of user who have submit login form
@@ -116,6 +116,14 @@ class Local extends Core {
         // Init name of protocol
         this._protocolName = 'local';
     }
+
+    /**
+     * *************************************************************
+     * *************************************************************
+     * ********************* Private methods ***********************
+     * *************************************************************
+     * *************************************************************
+     */
 
     /**
      * Check if account IP is locked
@@ -232,6 +240,14 @@ class Local extends Core {
     private _userIsBanned(ip : string) : boolean {
         return _.indexOf(this._userJail, ip) != -1;
     }
+
+    /**
+     * *************************************************************
+     * *************************************************************
+     * ********************** Public methods ***********************
+     * *************************************************************
+     * *************************************************************
+     */
 
     /**
      * Add a new connection attempt
@@ -365,6 +381,38 @@ class Local extends Core {
     }
 
     /**
+     * Lock account manually
+     * @method lockAccount
+     *
+     * @param accountID {string}    AccountID
+     * @param time {number}         Optional lock time in seconds
+     */
+    public lockAccount(accountID : string, time ?: number) : void {
+        // Check if account locker is enabled
+        if (!this._accountLockEnable) {
+            console.log('Trapjs :: You try lock manually account but system is currently off (jailConfig.accountLockEnable = false)');
+            return;
+        }
+
+        // Calculate new time of ban
+        var customTime : number = (time) ? time * 1000 : this._accountLockTime;
+
+        // Check if user is already banned
+        if (this._accountIsLocked(accountID)) {
+            // Add more ban time
+            this._accountJailInfo[accountID].endLock = Date.now() + customTime;
+        } else {
+            // Send user into jail
+            this._accountJail.push(accountID);
+
+            // Store info about end of ban
+            this._accountJailInfo[accountID] = {
+                endLock : Date.now() + customTime
+            }
+        }
+    }
+
+    /**
      * Check if user/account are allowed to auth
      * @method loginAttempt
      *
@@ -395,7 +443,21 @@ class Local extends Core {
                     }
                 }
             );
-        } else {
+        }
+        // Check account
+        else if (this._accountLockEnable && this._accountIsLocked(accountID)) {
+            // Send callback with error
+            cb(
+                {
+                    code : 'E_ACCOUNT_LOCK',
+                    account : {
+                        lockTime : (this._accountJailInfo[accountID].endLock - Date.now()) / 1000
+                    }
+                }
+            );
+        }
+        // No one locked, send callback
+        else {
             // Send callback
             cb();
         }
@@ -415,6 +477,62 @@ class Local extends Core {
         if (userIndex != -1) {
             delete (this._userJailInfo[ip]);
             this._userJail.splice(userIndex, 1);
+
+            // Remove attempt from user
+            if (this._userList[ip]) {
+                // Clear array
+                while (this._userList[ip].attempts.length > 0) {
+                    this._userList[ip].attempts.pop();
+                }
+
+                // And remove user proprely
+                delete (this._userList[ip]);
+            }
+
+            // Remove all attempt user from list
+            while (_.indexOf(this._userAttempts, ip) != -1) {
+                var index : number = (_.indexOf(this._userAttempts, ip));
+                this._userAttempts.splice(index, 1);
+            }
+        }
+    }
+
+    /**
+     * Unlock account manually
+     * @method unlockAccount
+     *
+     * @param accountID {string}    Account ID for unlock
+     */
+    public unlockAccount(accountID : string) : void {
+        // Check if account locker is enabled
+        if (!this._accountLockEnable) {
+            return;
+        }
+
+        // Get index of account
+        var accountIndex : number = _.indexOf(this._accountJail, accountID);
+
+        // Check if account in really in jail or not
+        if (accountIndex != -1) {
+            delete (this._accountJailInfo[accountID]);
+            this._accountJail.splice(accountIndex, 1);
+
+            // Remove attempt from account
+            if (this._accountList[accountID]) {
+                // Clear array
+                while (this._accountList[accountID].attempts.length > 0) {
+                    this._accountList[accountID].attempts.pop();
+                }
+
+                // And remove account proprely
+                delete (this._accountList[accountID]);
+            }
+
+            // Remove all attempt account from list
+            while (_.indexOf(this._accountAttempts, accountID) != -1) {
+                var index : number = (_.indexOf(this._accountAttempts, accountID));
+                this._accountAttempts.splice(index, 1);
+            }
         }
     }
 }

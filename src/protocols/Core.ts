@@ -189,6 +189,17 @@ class Core {
         return this._protocolName;
     }
 
+    /**
+     * Lock account manually
+     * @method lockAccount
+     *
+     * @param accountID {string}    AccountID
+     * @param time {number}         Optional lock time in seconds
+     */
+    public lockAccount(accountID : string, time ?: number) : void {
+
+    }
+
     public loginAttempt(accountID : string, userIP : string, cb : (err ?: any) => void) : void {
 
     }
@@ -200,6 +211,16 @@ class Core {
      * @param userIP {string}       IP of user who must be unbanned
      */
     public unbanUser(userIP : string) : void {
+
+    }
+
+    /**
+     * Unlock account manually
+     * @method unlockAccount
+     *
+     * @param accountID {string}    Account ID for unlock
+     */
+    public unlockAccount(accountID : string) : void {
 
     }
 }

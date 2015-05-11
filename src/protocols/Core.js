@@ -50,9 +50,13 @@ var Core = (function () {
     Core.prototype.getName = function () {
         return this._protocolName;
     };
+    Core.prototype.lockAccount = function (accountID, time) {
+    };
     Core.prototype.loginAttempt = function (accountID, userIP, cb) {
     };
     Core.prototype.unbanUser = function (userIP) {
+    };
+    Core.prototype.unlockAccount = function (accountID) {
     };
     return Core;
 })();

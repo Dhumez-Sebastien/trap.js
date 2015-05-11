@@ -213,12 +213,27 @@ class Trap {
 
     }
 
+    /**
+     * Lock account manually
+     * @method lockAccount
+     *
+     * @param accountID {string}    AccountID
+     * @param time {number}         Optional lock time in seconds
+     */
     public lockAccount(accountID : string, time ?: number) : void {
-
+        this._protocolUsed.lockAccount(accountID, time);
     }
 
-    public loginAttempt(accountID : string, userIP : string, cb : (err : any) => void) : Trap {
-        this._protocolUsed.loginAttempt(accountID, userIP, cb);
+    /**
+     * Check if user/account are allowed to auth
+     * @method loginAttempt
+     *
+     * @param accountID {string}    Account ID for auth
+     * @param ip {string}           User IP for auth
+     * @param cb {function}         Callback
+     */
+    public loginAttempt(accountID : string, ip : string, cb : (err : any) => void) : Trap {
+        this._protocolUsed.loginAttempt(accountID, ip, cb);
         return this;
     }
 
@@ -232,8 +247,14 @@ class Trap {
         this._protocolUsed.unbanUser(userIP);
     }
 
+    /**
+     * Unlock account manually
+     * @method unlockAccount
+     *
+     * @param accountID {string}    Account ID for unlock
+     */
     public unlockAccount(accountID : string) : void {
-
+        this._protocolUsed.unlockAccount(accountID);
     }
 
     /**
