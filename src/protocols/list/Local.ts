@@ -395,7 +395,7 @@ class Local extends Core {
         }
 
         // Calculate new time of ban
-        var customTime : number = (time) ? time * 1000 : this._accountLockTime;
+        var customTime : number = (time) ? (time * 1000) : this._accountLockTime;
 
         // Check if user is already banned
         if (this._accountIsLocked(accountID)) {

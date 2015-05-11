@@ -90,12 +90,59 @@ describe('Functional :: Protocols :: Local', function () {
             trapjs.addAttempt('Seby45', '112.0.0.0');
         }
 
-        // user must be banned
+        // Account must be locked
         trapjs.loginAttempt('Seby45', '112.0.0.0', function(err) {
             assert(err != void 0);
             assert(err.code == 'E_ACCOUNT_LOCK');
             assert(typeof err.account.lockTime == 'number');
             assert(err.account.lockTime > 550 && err.account.lockTime < 601);
+            done();
+        });
+    });
+
+    it('should unlock account manually', function(done) {
+        // Unlock account
+        trapjs.unlockAccount('Seby45');
+
+        // Account must be locked
+        trapjs.loginAttempt('Seby45', '112.0.0.0', function(err) {
+            assert(err == void 0);
+            done();
+        });
+    });
+
+    it('should lock account manually', function(done) {
+        // Ban user
+        trapjs.lockAccount('Seby45');
+
+        // Check ban
+        trapjs.loginAttempt('Seby45', '112.0.0.0', function(err) {
+            assert(err != void 0);
+            assert(err.code == 'E_ACCOUNT_LOCK');
+            assert(typeof err.account.lockTime == 'number');
+            assert(err.account.lockTime > 550 && err.account.lockTime < 601);
+
+            // Unlock account
+            trapjs.unlockAccount('Seby45');
+
+            done();
+        });
+    });
+
+    it('should lock account manually with more time', function(done) {
+        // Add more time
+        trapjs.lockAccount('Seby45', 86400);
+
+        // Check ban
+        trapjs.loginAttempt('Seby45', '112.0.0.0', function(err) {
+            assert(err != void 0);
+            assert(err.code == 'E_ACCOUNT_LOCK');
+            assert(typeof err.account.lockTime == 'number');
+            assert(err.account.lockTime > 86300 && err.account.lockTime < 86401);
+
+            // Unlock account
+            trapjs.unlockAccount('Seby45');
+
             done();
         });
     });

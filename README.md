@@ -95,10 +95,10 @@ trapjs.unbanUser('0, 0, 0, 0');
 trapjs.banUser('0, 0, 0, 0', 3600);
 
 // Unlock account
-//trapjs.unlockAccount('accountID'); -- In dev
+trapjs.unlockAccount('accountID');
 
 // Lock account during time
-//trapjs.lockAccount('accountID', 3600); -- In dev
+trapjs.lockAccount('accountID', 3600);
 
 // Allow IPs for direct login attempt
 trapjs.allowIP(['0, 0, 0, 0', '127.0.0.1']);

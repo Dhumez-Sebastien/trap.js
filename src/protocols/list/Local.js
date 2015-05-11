@@ -145,7 +145,7 @@ var Local = (function (_super) {
             console.log('Trapjs :: You try lock manually account but system is currently off (jailConfig.accountLockEnable = false)');
             return;
         }
-        var customTime = (time) ? time * 1000 : this._accountLockTime;
+        var customTime = (time) ? (time * 1000) : this._accountLockTime;
         if (this._accountIsLocked(accountID)) {
             this._accountJailInfo[accountID].endLock = Date.now() + customTime;
         }
