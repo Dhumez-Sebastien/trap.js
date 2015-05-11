@@ -27,7 +27,7 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
      *
      * @param jailConfig {IJailConfig}      Jail configuration
      */
-    public constructor(jailConfig : IJailConfig) {
+    public constructor(jailConfig:IJailConfig) {
         super(jailConfig);
 
         // Init name of protocol
@@ -41,7 +41,7 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
      * @param ip {string}       IP address of user allowed
      * @return {boolean}        Return true if IP is added or false is she's already in DB
      */
-    public allowIP(ip : string) : boolean {
+    public allowIP(ip:string):boolean {
         return false;
     }
 
@@ -50,9 +50,9 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
      *
      * @method loadProtocol
      */
-    public boot(redisConfig : IRedisProtocolConfig, cb : Function) : void {
+    public boot(redisConfig:IRedisProtocolConfig, cb:Function):void {
         // Debug
-        console.log('Trapjs :: Protocol <'+this._protocolName+'> trying start');
+        console.log('Trapjs :: Protocol <' + this._protocolName + '> trying start');
 
         // Try connect to redis server
         this._redis = new ioredis({
@@ -64,14 +64,54 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
         });
 
         // When client is correctly connected
-        this._redis.once('connect', function() {
+        this._redis.once('connect', function () {
             cb();
         });
 
         // Show errors
-        this._redis.once('error', function(err) {
-            console.warn('Redis Protocol error : '+err);
+        this._redis.once('error', function (err) {
+            console.warn('Redis Protocol error : ' + err);
         });
+    }
+
+    /**
+     * Get the list of users actually
+     * @method getAccounts
+     *
+     * @param cb {Function}                 Callback to get list of users
+     */
+    public getAccounts(cb : (err : any, res : ILocalProtocolAccountPublic[]) => void) : void {
+
+    }
+
+    /**
+     * Get the list of users banned actually
+     * @method getBannedUsers
+     *
+     * @param cb {Function}                 Callback to get list of banned users
+     */
+    public getBannedUsers(cb:(err:any, res:IUserJailInfoPublic[]) => void) : void {
+
+    }
+
+    /**
+     * Get the list of users banned actually
+     * @method getBannedUsers
+     *
+     * @param cb {Function}                 Callback to get list of banned users
+     */
+    public getLockedAccounts(cb:(err:any, res:IAccountJailInfoPublic[]) => void):void {
+
+    }
+
+    /**
+     * Get the list of users actually
+     * @method getUsers
+     *
+     * @param cb {Function}                 Callback to get list of users
+     */
+    public getUsers(cb:(err:any, res:ILocalProtocolUserPublic[]) => void):void {
+
     }
 }
 

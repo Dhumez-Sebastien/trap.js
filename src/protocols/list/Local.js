@@ -86,18 +86,18 @@ var Local = (function (_super) {
         }
         if (!this._userList[userIP]) {
             this._userList[userIP] = {
-                banTimestamp: 0,
                 attempts: []
             };
         }
         this._userList[userIP].attempts.push({
-            account: accountID,
+            accountID: accountID,
             date: Date.now()
         });
         this._userAttempts.push(userIP);
         if (this._userList[userIP].attempts.length >= this._userMaxRetry) {
             this._userJail.push(userIP);
             this._userJailInfo[userIP] = {
+                attempts: this._userList[userIP].attempts,
                 endBan: Date.now() + this._userBanTime
             };
         }
@@ -116,6 +116,7 @@ var Local = (function (_super) {
             if (this._accountList[accountID].attempts.length >= this._accountMaxRetry) {
                 this._accountJail.push(accountID);
                 this._accountJailInfo[accountID] = {
+                    attempts: this._accountList[accountID].attempts,
                     endLock: Date.now() + this._accountLockTime
                 };
             }
@@ -136,9 +137,52 @@ var Local = (function (_super) {
         else {
             this._userJail.push(ip);
             this._userJailInfo[ip] = {
+                attempts: [],
                 endBan: Date.now() + customTime
             };
         }
+    };
+    Local.prototype.getAccounts = function (cb) {
+        var out = [];
+        for (var i = 0, ls = this._accountAttempts.length; i < ls; i++) {
+            var info = this._accountList[this._accountAttempts[i]];
+            info.accountID = this._accountAttempts[i];
+            if (this._accountIsLocked(this._accountAttempts[i])) {
+                info.endLock = this._accountJailInfo[this._accountAttempts[i]].endLock;
+            }
+            out.push(info);
+        }
+        cb(null, out);
+    };
+    Local.prototype.getBannedUsers = function (cb) {
+        var out = [];
+        for (var i = 0, ls = this._userJail.length; i < ls; i++) {
+            var info = this._userJailInfo[this._userJail[i]];
+            info.ip = this._userJail[i];
+            out.push(info);
+        }
+        cb(null, out);
+    };
+    Local.prototype.getLockedAccounts = function (cb) {
+        var out = [];
+        for (var i = 0, ls = this._accountJail.length; i < ls; i++) {
+            var info = this._accountJailInfo[this._accountJail[i]];
+            info.accountID = this._accountJail[i];
+            out.push(info);
+        }
+        cb(null, out);
+    };
+    Local.prototype.getUsers = function (cb) {
+        var out = [];
+        for (var i = 0, ls = this._userAttempts.length; i < ls; i++) {
+            var info = this._userList[this._userAttempts[i]];
+            info.ip = this._userAttempts[i];
+            if (this._userIsBanned(this._userAttempts[i])) {
+                info.endBan = this._userJailInfo[this._userAttempts[i]].endBan;
+            }
+            out.push(info);
+        }
+        cb(null, out);
     };
     Local.prototype.lockAccount = function (accountID, time) {
         if (!this._accountLockEnable) {
@@ -152,6 +196,7 @@ var Local = (function (_super) {
         else {
             this._accountJail.push(accountID);
             this._accountJailInfo[accountID] = {
+                attempts: [],
                 endLock: Date.now() + customTime
             };
         }

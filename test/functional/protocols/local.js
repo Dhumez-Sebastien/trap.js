@@ -12,16 +12,60 @@ describe('Functional :: Protocols :: Local', function () {
         assert(trapjs.getProtocolName() == 'local', 'error must get local but  : '+trapjs.getProtocolName());
     });
 
-    it('should simple user attempt', function(done) {
+    it('should get none users', function(done) {
+        trapjs.getUsers(function(err, res) {
+            assert(err == null, 'error must be null : '+err);
+            assert(res.length == 0, 'array must be empty : '+res.length);
+            done();
+        });
+    });
+
+    it('should get none accounts', function(done) {
+        trapjs.getAccounts(function(err, res) {
+            assert(err == null, 'error must be null : '+err);
+            assert(res.length == 0, 'array must be empty : '+res.length);
+            done();
+        });
+    });
+
+    it('should simple user login attempt', function(done) {
         trapjs.loginAttempt('Seby45', '112.0.0.0', function(err) {
             assert(err == void 0, 'error must be undefined : '+err);
             done();
         });
     });
 
+    it('should get first users', function(done) {
+        // Add an attempt to store User/IP in local
+        trapjs.addAttempt('Seby45', '112.0.0.0');
+
+        trapjs.getUsers(function(err, res) {
+            assert(err == null, 'error must be null : '+err);
+            assert(res.length == 1, 'array must be 1 : '+res.length);
+            assert(res[0].attempts[0].accountID == 'Seby45', 'attempt accountID must be Seby45: '+res[0].attempts[0].accountID);
+            assert(typeof res[0].attempts[0].date == 'number', 'date is not number : '+typeof res[0].attempts[0].date);
+            assert(res[0].ip == '112.0.0.0', 'ip must be 112.0.0.0: '+res[0].ip);
+            assert(res[0].endBan == void 0, 'endBan must be undefined : '+res[0].endBan);
+            done();
+        });
+    });
+
+    it('should get first account', function(done) {
+        // Attempt is added in previous test
+        trapjs.getAccounts(function(err, res) {
+            assert(err == null, 'error must be null : '+err);
+            assert(res.length == 1, 'array must be 1 : '+res.length);
+            assert(res[0].attempts[0].ip == '112.0.0.0', 'attempt ip must be 112.0.0.0: '+res[0].attempts[0].ip );
+            assert(res[0].accountID == 'Seby45', 'ip must be 112.0.0.0: '+res[0].accountID);
+            assert(res[0].endLock == void 0, 'endLock must be undefined : '+res[0].endLock);
+            done();
+        });
+    });
+
+
     it('should ban user', function(done) {
         // Loop login for ban
-        for (var i = 0; i < 11; i++) {
+        for (var i = 0; i < 10; i++) {
             trapjs.addAttempt('Seby45', '112.0.0.0');
         }
 
@@ -142,6 +186,56 @@ describe('Functional :: Protocols :: Local', function () {
 
             // Unlock account
             trapjs.unlockAccount('Seby45');
+
+            done();
+        });
+    });
+
+    it('should get list of banned users', function(done) {
+        // Ban 2 users
+        trapjs.banUser('100.0.0.0');
+        trapjs.banUser('100.0.0.1');
+
+        // Check list
+        trapjs.getBannedUsers(function(err, res) {
+            assert(err == null);
+            assert(res.length == 2, res.length);
+            assert(res[0].ip == '100.0.0.0');
+            assert(res[1].ip == '100.0.0.1');
+            assert(res[0].attempts.length == 0);
+            assert(res[1].attempts.length == 0);
+            assert(typeof res[0].endBan == 'number');
+            assert(typeof res[1].endBan == 'number');
+
+            // Unban users
+            trapjs.unbanUser(['100.0.0.0', '100.0.0.1']);
+
+            done();
+        });
+    });
+
+    it('should get list of locked accounts', function(done) {
+        // Lock 2 accounts
+        trapjs.lockAccount('Seby45', 300);
+        trapjs.lockAccount('Seby46', 300);
+
+        // Check list
+        trapjs.getLockedAccounts(function(err, res) {
+            assert(err == null);
+            assert(res.length == 2, res.length);
+            assert(res[0].accountID == 'Seby45');
+            assert(res[1].accountID == 'Seby46');
+            assert(res[0].attempts.length == 0);
+            assert(res[1].attempts.length == 0);
+            assert(typeof res[0].endLock == 'number');
+            assert(typeof res[1].endLock == 'number');
+            assert(res[0].endLock <= Date.now() + (300 * 1000));
+            assert(res[0].endLock >  Date.now() + (250 * 1000));
+            assert(res[1].endLock <=  Date.now() + (300 * 1000));
+            assert(res[1].endLock >  Date.now() + (250 * 1000));
+
+            // Unlock accounts
+            trapjs.unlockAccount(['Seby45', 'Seby46']);
 
             done();
         });

@@ -1,5 +1,6 @@
 ///<reference path="./defLoader.d.ts" />
 var fs = require('fs');
+var _ = require('lodash');
 var Trap = (function () {
     function Trap() {
         this._jailConfiguration = {
@@ -61,40 +62,62 @@ var Trap = (function () {
     };
     Trap.prototype.banUser = function (ip, time) {
         this._protocolUsed.banUser(ip, time);
+        return this;
     };
     Trap.prototype.configJail = function (jailConfiguration) {
         this._protocolUsed.configJail(jailConfiguration);
         return this;
     };
-    Trap.prototype.getAccounts = function () {
-        return [];
+    Trap.prototype.getAccounts = function (cb) {
+        this._protocolUsed.getAccounts(cb);
+        return this;
     };
-    Trap.prototype.getBannedUsers = function () {
-        return [];
+    Trap.prototype.getBannedUsers = function (cb) {
+        this._protocolUsed.getBannedUsers(cb);
+        return this;
     };
-    Trap.prototype.getLockedAccounts = function () {
-        return [];
+    Trap.prototype.getLockedAccounts = function (cb) {
+        this._protocolUsed.getLockedAccounts(cb);
+        return this;
     };
     Trap.prototype.getProtocolName = function () {
         return this._protocolUsed.getName();
     };
-    Trap.prototype.getUsers = function () {
-        return [];
+    Trap.prototype.getUsers = function (cb) {
+        this._protocolUsed.getUsers(cb);
+        return this;
     };
     Trap.prototype.injectProtocols = function () {
     };
     Trap.prototype.lockAccount = function (accountID, time) {
         this._protocolUsed.lockAccount(accountID, time);
+        return this;
     };
     Trap.prototype.loginAttempt = function (accountID, ip, cb) {
         this._protocolUsed.loginAttempt(accountID, ip, cb);
         return this;
     };
-    Trap.prototype.unbanUser = function (userIP) {
-        this._protocolUsed.unbanUser(userIP);
+    Trap.prototype.unbanUser = function (ip) {
+        if (_.isArray(ip)) {
+            for (var i = 0, ls = ip.length; i < ls; i++) {
+                this.unbanUser(ip[i]);
+            }
+        }
+        else {
+            this._protocolUsed.unbanUser(ip);
+        }
+        return this;
     };
     Trap.prototype.unlockAccount = function (accountID) {
-        this._protocolUsed.unlockAccount(accountID);
+        if (_.isArray(accountID)) {
+            for (var i = 0, ls = accountID.length; i < ls; i++) {
+                this.unlockAccount(accountID[i]);
+            }
+        }
+        else {
+            this._protocolUsed.unlockAccount(accountID);
+        }
+        return this;
     };
     Trap.prototype.useProtocol = function (protocol, cb) {
         if (this._ready || this._protocols[protocol.protocol]) {

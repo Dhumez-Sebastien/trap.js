@@ -7,6 +7,7 @@
  */
 ///<reference path="./def/IAccountJailInfo.d.ts" />
 ///<reference path="./def/IJailConfig.d.ts" />
+///<reference path="./def/ILocalProtocolAccount.d.ts" />
 ///<reference path="./def/ILocalProtocolUser.d.ts" />
 ///<reference path="./def/IRedisProtocolConfig.d.ts" />
 ///<reference path="./def/IUserJailInfo.d.ts" />
@@ -30,6 +31,10 @@ declare module Trapjs {
             banUser(ip : string, time ?: number) : void;
             boot(protocolConfig : any, cb : Function) : void;
             configJail(jailConfig : IJailConfig) : void;
+            getAccounts(cb : (err : any, res : ILocalProtocolAccountPublic[]) => void) : void;
+            getBannedUsers(cb : (err : any, res : IUserJailInfoPublic[]) => void) : void;
+            getLockedAccounts(cb : (err : any, res : IAccountJailInfoPublic[]) => void) : void;
+            getUsers(cb : (err : any, res : ILocalProtocolUserPublic[]) => void) : void;
             getName() : string;
             lockAccount(accountID : string, time ?: number) : void;
             loginAttempt(accountID : string, userIP : string, cb : (err ?: any) => void) : void;
@@ -38,11 +43,11 @@ declare module Trapjs {
         }
 
         interface Local extends Core {
-
+            //getBannedUsers() : IUserJailInfoPublic[];
         }
 
         interface Redis extends Core {
-            boot(redisConfig :IRedisProtocolConfig, cb : Function) : void;
+            //boot(redisConfig :IRedisProtocolConfig, cb : Function) : void;
         }
     }
 }

@@ -2,7 +2,12 @@ interface ILocalProtocolUser {
     attempts : ILocalProtocolUserAttempt[];
 }
 
+interface ILocalProtocolUserPublic extends ILocalProtocolUser {
+    endBan ?: number;       // If user is banned
+    ip : string;
+}
+
 interface ILocalProtocolUserAttempt {
-    account : string;
+    accountID : string;
     date : number;
 }

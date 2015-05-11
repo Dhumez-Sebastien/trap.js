@@ -3,6 +3,7 @@
 import Redis = require("./protocols/list/Redis");
 import fs = require('fs');
 import path = require('path');
+import _ = require('lodash');
 
 /**
  * Trap
@@ -67,7 +68,6 @@ class Trap {
 
     /**
      * Basic constructor
-     *
      */
     constructor() {
         //Scope
@@ -167,8 +167,9 @@ class Trap {
      * @param ip {string}       IP address of user
      * @param time {number}     Optional ban time in seconds
      */
-    public banUser(ip : string, time ?: number) : void {
+    public banUser(ip : string, time ?: number) : Trap {
         this._protocolUsed.banUser(ip, time);
+        return this;
     }
 
     /**
@@ -182,16 +183,40 @@ class Trap {
         return this;
     }
 
-    public getAccounts() : any[] {
-        return [];
+    /**
+     * Get the list of accounts actually in db
+     * @method getAccounts
+     *
+     * @param cb {Function}         Callback to get list of users
+     * @return {Trap}               Return Trapjs instance
+     */
+    public getAccounts(cb : (err : any, res : ILocalProtocolAccountPublic[]) => void) : Trap {
+        this._protocolUsed.getAccounts(cb);
+        return this;
     }
 
-    public getBannedUsers() : any[] {
-        return [];
+    /**
+     * Get the list of users actually banned
+     * @method getBannedUsers
+     *
+     * @param cb {Function}                 Callback to get list of banned users
+     * @return {Trap}               Return Trapjs instance
+     */
+    public getBannedUsers(cb : (err : any, res : IUserJailInfoPublic[]) => void) : Trap {
+        this._protocolUsed.getBannedUsers(cb);
+        return this;
     }
 
-    public getLockedAccounts() : any[] {
-        return [];
+    /**
+     * Get the list of accounts actually locked
+     * @method getLockedAccounts
+     *
+     * @param cb {Function}                 Callback to get list of banned users
+     * @return {Trap}               Return Trapjs instance
+     */
+    public getLockedAccounts(cb : (err : any, res : IAccountJailInfoPublic[]) => void) : Trap {
+        this._protocolUsed.getLockedAccounts(cb);
+        return this;
     }
 
     /**
@@ -204,9 +229,16 @@ class Trap {
         return this._protocolUsed.getName();
     }
 
-
-    public getUsers() : any[] {
-        return [];
+    /**
+     * Get the list of users actually in db
+     * @method getUsers
+     *
+     * @param cb {Function}         Callback to get list of users
+     * @return {Trap}               Return Trapjs instance
+     */
+    public getUsers(cb : (err : any, res : ILocalProtocolUserPublic[]) => void) : Trap {
+        this._protocolUsed.getUsers(cb);
+        return this;
     }
 
     public injectProtocols() : void {
@@ -219,9 +251,11 @@ class Trap {
      *
      * @param accountID {string}    AccountID
      * @param time {number}         Optional lock time in seconds
+     * @return {Trap}               Return Trapjs instance
      */
-    public lockAccount(accountID : string, time ?: number) : void {
+    public lockAccount(accountID : string, time ?: number) : Trap {
         this._protocolUsed.lockAccount(accountID, time);
+        return this;
     }
 
     /**
@@ -231,6 +265,7 @@ class Trap {
      * @param accountID {string}    Account ID for auth
      * @param ip {string}           User IP for auth
      * @param cb {function}         Callback
+     * @return {Trap}               Return Trapjs instance
      */
     public loginAttempt(accountID : string, ip : string, cb : (err : any) => void) : Trap {
         this._protocolUsed.loginAttempt(accountID, ip, cb);
@@ -241,10 +276,20 @@ class Trap {
      * Unban user manually
      * @method unbanUser
      *
-     * @param userIP {string}       IP of user who must be unbanned
+     * @param ip {string|string[]}          IP(s) of user(s) who must be unbanned
+     * @return {Trap}               Return Trapjs instance
      */
-    public unbanUser(userIP : string) : void {
-        this._protocolUsed.unbanUser(userIP);
+    public unbanUser(ip : string) : Trap {
+        // Check if user send a list of IP or only simple IP
+        if (_.isArray(ip)) {
+            for (var i : number = 0, ls : number = ip.length; i < ls; i++) {
+                this.unbanUser(ip[i]);
+            }
+        } else {
+            // Launch unban user
+            this._protocolUsed.unbanUser(ip);
+        }
+        return this;
     }
 
     /**
@@ -252,9 +297,19 @@ class Trap {
      * @method unlockAccount
      *
      * @param accountID {string}    Account ID for unlock
+     * @return {Trap}               Return Trapjs instance
      */
-    public unlockAccount(accountID : string) : void {
-        this._protocolUsed.unlockAccount(accountID);
+    public unlockAccount(accountID : string) : Trap {
+        // Check if user send a list of IP or only simple IP
+        if (_.isArray(accountID)) {
+            for (var i : number = 0, ls : number = accountID.length; i < ls; i++) {
+                this.unlockAccount(accountID[i]);
+            }
+        } else {
+            // Launch unban user
+            this._protocolUsed.unlockAccount(accountID);
+        }
+        return this;
     }
 
     /**

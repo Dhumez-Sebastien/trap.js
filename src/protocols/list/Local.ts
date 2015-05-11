@@ -49,10 +49,10 @@ class Local extends Core {
      * Contains a list of accounts that have been used for connection
      *
      * @property _accountList
-     * @type {string[]}
+     * @type {ILocalProtocolAccount[]}
      * @private
      */
-    private _accountList : string[] = [];
+    private _accountList : ILocalProtocolAccount[] = [];
 
     /**
      * ****************************************************
@@ -273,14 +273,13 @@ class Local extends Core {
         // Check if user IP is in list
         if (!this._userList[userIP]) {
             this._userList[userIP] = {
-                banTimestamp : 0,
                 attempts : []
             };
         }
 
         // Add attempt
         this._userList[userIP].attempts.push({
-            account : accountID,
+            accountID : accountID,
             date : Date.now()
         });
 
@@ -295,6 +294,7 @@ class Local extends Core {
 
             // Store info about end of ban
             this._userJailInfo[userIP] = {
+                attempts : this._userList[userIP].attempts,
                 endBan : Date.now() + this._userBanTime
             }
         }
@@ -332,6 +332,7 @@ class Local extends Core {
 
                 // Store info about end of ban
                 this._accountJailInfo[accountID] = {
+                    attempts : this._accountList[accountID].attempts,
                     endLock : Date.now() + this._accountLockTime
                 }
             }
@@ -375,9 +376,125 @@ class Local extends Core {
 
             // Store info about end of ban
             this._userJailInfo[ip] = {
+                attempts : [],
                 endBan : Date.now() + customTime
             }
         }
+    }
+
+    /**
+     * Get the list of users actually
+     * @method getAccounts
+     *
+     * @param cb {Function}                 Callback to get list of users
+     */
+    public getAccounts(cb : (err : any, res : ILocalProtocolAccountPublic[]) => void) : void {
+        // Build out array
+        var out : ILocalProtocolAccountPublic[] = [];
+
+        // Get all users actually in jail
+        for (var i : number = 0, ls : number = this._accountAttempts.length; i < ls; i++) {
+            // Get user information
+            var info : ILocalProtocolAccountPublic = this._accountList[this._accountAttempts[i]];
+
+            // Apply account ID
+            info.accountID = this._accountAttempts[i];
+
+            // Check if user is banned to get his end time of ban
+            if (this._accountIsLocked(this._accountAttempts[i])) {
+                info.endLock = this._accountJailInfo[this._accountAttempts[i]].endLock;
+            }
+
+            // Push info into array
+            out.push(info);
+        }
+
+        // Send callback with reply
+        cb(null, out);
+    }
+
+
+    /**
+     * Get the list of users banned actually
+     * @method getBannedUsers
+     *
+     * @param cb {Function}                 Callback to get list of banned users
+     */
+    public getBannedUsers(cb : (err : any, res : IUserJailInfoPublic[]) => void) : void {
+        // Build out array
+        var out : IUserJailInfoPublic[] = [];
+
+        // Get all users actually in jail
+        for (var i : number = 0, ls : number = this._userJail.length; i < ls; i++) {
+            // Get user information
+            var info : IUserJailInfoPublic = this._userJailInfo[this._userJail[i]];
+
+            // Apply IP
+            info.ip = this._userJail[i];
+
+            // Push info into array
+            out.push(info);
+        }
+
+        // Send callback with reply
+        cb(null, out);
+    }
+
+    /**
+     * Get the list of users banned actually
+     * @method getBannedUsers
+     *
+     * @param cb {Function}                 Callback to get list of banned users
+     */
+    public getLockedAccounts(cb : (err : any, res : IAccountJailInfoPublic[]) => void) : void {
+        // Build out array
+        var out : IAccountJailInfoPublic[] = [];
+
+        // Get all users actually in jail
+        for (var i : number = 0, ls : number = this._accountJail.length; i < ls; i++) {
+            // Get user information
+            var info : IAccountJailInfoPublic = this._accountJailInfo[this._accountJail[i]];
+
+            // Apply IP
+            info.accountID = this._accountJail[i];
+
+            // Push info into array
+            out.push(info);
+        }
+
+        // Send callback with reply
+        cb(null, out);
+    }
+
+    /**
+     * Get the list of users actually
+     * @method getUsers
+     *
+     * @param cb {Function}                 Callback to get list of users
+     */
+    public getUsers(cb : (err : any, res : ILocalProtocolUserPublic[]) => void) : void {
+        // Build out array
+        var out : ILocalProtocolUserPublic[] = [];
+
+        // Get all users actually in jail
+        for (var i : number = 0, ls : number = this._userAttempts.length; i < ls; i++) {
+            // Get user information
+            var info : ILocalProtocolUserPublic = this._userList[this._userAttempts[i]];
+
+            // Apply IP
+            info.ip = this._userAttempts[i];
+
+            // Check if user is banned to get his end time of ban
+            if (this._userIsBanned(this._userAttempts[i])) {
+                info.endBan = this._userJailInfo[this._userAttempts[i]].endBan;
+            }
+
+            // Push info into array
+            out.push(info);
+        }
+
+        // Send callback with reply
+        cb(null, out);
     }
 
     /**
@@ -407,6 +524,7 @@ class Local extends Core {
 
             // Store info about end of ban
             this._accountJailInfo[accountID] = {
+                attempts : [],
                 endLock : Date.now() + customTime
             }
         }
@@ -485,7 +603,7 @@ class Local extends Core {
                     this._userList[ip].attempts.pop();
                 }
 
-                // And remove user proprely
+                // And remove user properly
                 delete (this._userList[ip]);
             }
 

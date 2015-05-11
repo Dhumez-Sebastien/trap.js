@@ -1,5 +1,9 @@
 # trap.js
-Protect your app against brute force tentatives.
+#### Protect your app against brute force tentatives.
+
+More and more Node.js applications are victims of brute-force attack if you have an authentication space. Trap.js was designed to lock those users.
+
+Trap.js can lock account temporary if he's a victime of brute-force-attack.
 
 # Quick Start
 
@@ -19,8 +23,8 @@ trapjs.loginAttempt('accountID', '0.0.0.0', function(err) {
     if (err) {
         // err.code                     :: 'E_ACCOUNT_LOCK' :: Account is temporary locked
         // err.code                     :: 'E_USER_BAN'     :: User is temporary banned
-        // err.account.lockTime         :: 173 :: Time remaining until unlock account
-        // err.user.banTime             :: 125 :: Time remaining until unban
+        // err.account.lockTime         :: 173              :: Time remaining until unlock account (if account is locked)
+        // err.user.banTime             :: 125              :: Time remaining until unban (if user is banned)
     } else {
         // Begin connection request
         
@@ -90,6 +94,7 @@ trapjs.configJail(jailConfig);
 ```javascript
 // Unban user
 trapjs.unbanUser('0, 0, 0, 0');
+trapjs.unbanUser(['100, 100, 100, 100', '50, 50, 50, 50']);
 
 // Ban user during selected time
 trapjs.banUser('0, 0, 0, 0', 3600);
@@ -103,39 +108,43 @@ trapjs.lockAccount('accountID', 3600);
 // Allow IPs for direct login attempt
 trapjs.allowIP(['0, 0, 0, 0', '127.0.0.1']);
 
-// Get the list of users actually banned -- In dev
-/*trapjs.getBannedUsers(function(res) {
+// Get the list of users actually banned
+trapjs.getBannedUsers(function(res) {
     console.log(res);
     
+    // res[0].attempts  :: List of users attemps => attempts[0].account :: attempts[0].date
     // res[0].ip        :: 0.0.0.0
-    // res[0].banTime   :: 162
-});*/
+    // res[0].endBan    :: Date end of ban as timestamp format (with milliseconds)
+});
 
 // Get the list of users
-/*trapjs.getUsers(function(res) { -- In dev
+trapjs.getUsers(function(res) {
     console.log(res);
     
-    // res[0].ip        :: 0.0.0.0
-    // res[0].retry     :: [199787640000, 199787640010, 199787640030]
-    // res[0].unbanTime :: 199787650050
-});*/
+    // res[0].attempts[0].accountID     :: "Seb"
+    // res[0].attempts[0].date          :: 199787650050
+    // res[0].ip                        :: "0.0.0.0"
+    // res[0].endBan                    :: 199787650050
+});
 
 // Get the list of accounts actually locked
-/*trapjs.getLockedAccounts(function(res) { -- In dev
+trapjs.getLockedAccounts(function(res) {
     console.log(res);
     
-    // res[0].account   :: accountID
-    // res[0].lockTime  :: 162
-});*/
+    // res[0].attempts  :: List of users attemps => attempts[0].ip :: attempts[0].date
+    // res[0].accountID :: The accountID as string
+    // res[0].endLock   :: Date end of lock as timestamp format (with milliseconds)
+});
 
 // Get the list of accounts
-/*trapjs.getAccounts(function(res) { -- In dev
+trapjs.getAccounts(function(res) {
     console.log(res);
     
-    // res[0].account   :: accountID
-    // res[0].retry     :: [199787640000, 199787640010, 199787640030]
-    // res[0].unlockTime :: 199787650050
-});*/
+    // res[0].attempts[0].ip            :: "0.0.0.0"
+    // res[0].attempts[0].date          :: 199787650050
+    // res[0].accountID                 :: "Seb"
+    // res[0].endLock                   :: 199787650050
+});
 
 ```
 
@@ -157,5 +166,8 @@ And since I'm not an English native speaker (i'm French :p) so if you find any g
 
 # RoadMap
 
-* Finish correctly Local protocol
+* Add an EventEmitter when user is ban, account is locked...
 * Implements Redis protocol (with ioredis)
+* Add protocol injection to add your custom protocols into Trap.js
+* Beautify docs/explanations
+* Merge utility under protocols

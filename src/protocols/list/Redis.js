@@ -32,6 +32,14 @@ var Redis = (function (_super) {
             console.warn('Redis Protocol error : ' + err);
         });
     };
+    Redis.prototype.getAccounts = function (cb) {
+    };
+    Redis.prototype.getBannedUsers = function (cb) {
+    };
+    Redis.prototype.getLockedAccounts = function (cb) {
+    };
+    Redis.prototype.getUsers = function (cb) {
+    };
     return Redis;
 })(Core);
 module.exports = Redis;
