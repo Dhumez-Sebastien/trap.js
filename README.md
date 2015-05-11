@@ -3,7 +3,8 @@
 
 More and more Node.js applications are victims of brute-force attack if you have an authentication space. Trap.js was designed to lock those users.
 
-Trap.js can lock account temporary if he's a victime of brute-force-attack.
+Trap.js can store all connexion attempt during a predefined time and ban user if he got much connect attempt. But that's not all! Trap.js will 
+check if an account is a victim of brute force attacks and if it does, it will temporarily lock it!
 
 # Quick Start
 
