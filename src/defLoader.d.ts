@@ -16,7 +16,6 @@
 ///<reference path="./protocols/list/Local.ts" />
 ///<reference path="./protocols/list/Redis.ts" />
 
-///<reference path="./LogAttempt.ts" />
 ///<reference path="./Protocols.ts" />
 ///<reference path="./Trap.ts" />
 

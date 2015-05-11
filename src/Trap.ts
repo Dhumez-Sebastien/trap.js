@@ -1,6 +1,5 @@
 ///<reference path="./defLoader.d.ts" />
 
-import LogAttempt = require("./LogAttempt");
 import Redis = require("./protocols/list/Redis");
 import fs = require('fs');
 import path = require('path');

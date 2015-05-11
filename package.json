@@ -13,7 +13,7 @@
     "utility"
   ],
   "author": "Dhumez Sebastien <sebastien.dhumez@gmail.com>",
-  "main": "./lib/trap.js",
+  "main": "./src/Trap.js",
   "scripts": {
     "test": "mocha"
   },
