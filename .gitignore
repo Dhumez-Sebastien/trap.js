@@ -1,3 +1,8 @@
+#Webstorm conf
 .idea
+
 node_modules
 .npmignore
+
+# Coverage directory used by tools like istanbul
+coverage
