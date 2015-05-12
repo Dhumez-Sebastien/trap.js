@@ -23,7 +23,7 @@ addons:
     repo_token: 124ff5d713849631cd9745eda71833a3029f5e9436a066fcc47bdbd88c1dfb9b
 
 after_script:
-  - codeclimate < lcov.info
+  - codeclimate < coverage/lcov.info
 
 script:
     - npm test
