@@ -1,6 +1,9 @@
 # trap.js
 
 [![Build Status](https://travis-ci.org/Dhumez-Sebastien/trap.js.svg?branch=master)](https://travis-ci.org/Dhumez-Sebastien/trap.js)
+[![Code Climate](https://codeclimate.com/github/Dhumez-Sebastien/trap.js/badges/gpa.svg)](https://codeclimate.com/github/Dhumez-Sebastien/trap.js)
+[![Test Coverage](https://codeclimate.com/github/Dhumez-Sebastien/trap.js/badges/coverage.svg)](https://codeclimate.com/github/Dhumez-Sebastien/trap.js/coverage)
+[![Dependency Status](https://david-dm.org/Dhumez-Sebastien/trap.js.svg)](https://david-dm.org/Dhumez-Sebastien/trap.js)
 
 #### Protect your Node.js app against brute force tentatives.
 
