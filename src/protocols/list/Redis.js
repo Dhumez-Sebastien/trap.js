@@ -13,8 +13,12 @@ var Redis = (function (_super) {
         _super.call(this, jailConfig);
         this._protocolName = 'redis';
     }
+    Redis.prototype.addAttempt = function (accountID, userIP) {
+    };
     Redis.prototype.allowIP = function (ip) {
         return false;
+    };
+    Redis.prototype.banUser = function (ip, time) {
     };
     Redis.prototype.boot = function (redisConfig, cb) {
         console.log('Trapjs :: Protocol <' + this._protocolName + '> trying start');
@@ -39,6 +43,10 @@ var Redis = (function (_super) {
     Redis.prototype.getLockedAccounts = function (cb) {
     };
     Redis.prototype.getUsers = function (cb) {
+    };
+    Redis.prototype.lockAccount = function (accountID, time) {
+    };
+    Redis.prototype.loginAttempt = function (accountID, userIP, cb) {
     };
     return Redis;
 })(Core);

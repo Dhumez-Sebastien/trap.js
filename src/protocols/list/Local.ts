@@ -154,7 +154,7 @@ class Local extends Core {
                 this._userList[this._userAttempts[i]].attempts.shift();
 
                 // Check if user got
-                if (this._userList[this._userAttempts[i]].attempts.length == 0) {
+                if (this._userList[this._userAttempts[i]].attempts.length === 0) {
                     delete (this._userList[this._userAttempts[i]]);
                 }
 
@@ -174,22 +174,22 @@ class Local extends Core {
         var accountFindTime : number = Date.now() - this._accountFindTime;
 
         // Same but with accounts
-        for (var i : number = 0, ls = this._accountAttempts.length; i < ls; i++) {
+        for (var j : number = 0, lx = this._accountAttempts.length; j < lx; j++) {
             // Check if attempt may be removed
-            if (this._accountList[this._accountAttempts[i]].attempts[0].date < accountFindTime) {
-                this._accountList[this._accountAttempts[i]].attempts.shift();
+            if (this._accountList[this._accountAttempts[j]].attempts[0].date < accountFindTime) {
+                this._accountList[this._accountAttempts[j]].attempts.shift();
 
                 // Check if user got
-                if (this._accountList[this._accountAttempts[i]].attempts.length == 0) {
-                    delete (this._accountList[this._accountAttempts[i]]);
+                if (this._accountList[this._accountAttempts[j]].attempts.length == 0) {
+                    delete (this._accountList[this._accountAttempts[j]]);
                 }
 
                 // Remove first IP cause he's clear
                 this._accountAttempts.shift();
 
                 // Decrease index
-                ls--;
-                i--;
+                lx--;
+                j--;
             } else {
                 // The others user attempts must be stay in memory cause there not expired
                 break;
@@ -197,22 +197,22 @@ class Local extends Core {
         }
 
         // Unban user
-        for (var i : number = 0, ls : number = this._userJail.length; i < ls; i++) {
-            if (this._userJailInfo[this._userJail[i]].endBan < Date.now()) {
-                delete (this._userJailInfo[this._userJail[i]]);
-                this._userJail.splice(i, 1);
-                i--;
-                ls--;
+        for (var k : number = 0, ly : number = this._userJail.length; k < ly; k++) {
+            if (this._userJailInfo[this._userJail[k]].endBan < Date.now()) {
+                delete (this._userJailInfo[this._userJail[k]]);
+                this._userJail.splice(k, 1);
+                k--;
+                ly--;
             }
         }
 
         // Unlock account
-        for (var i : number = 0, ls : number = this._accountJail.length; i < ls; i++) {
-            if (this._accountJailInfo[this._accountJail[i]].endLock < Date.now()) {
-                delete (this._accountJailInfo[this._accountJail[i]]);
-                this._accountJail.splice(i, 1);
-                i--;
-                ls--;
+        for (var l : number = 0, lz : number = this._accountJail.length; l < lz; l++) {
+            if (this._accountJailInfo[this._accountJail[l]].endLock < Date.now()) {
+                delete (this._accountJailInfo[this._accountJail[l]]);
+                this._accountJail.splice(l, 1);
+                l--;
+                lz--;
             }
         }
     }
@@ -238,7 +238,7 @@ class Local extends Core {
      * @return {boolean}        Return true if user is banned else false
      */
     private _userIsBanned(ip : string) : boolean {
-        return _.indexOf(this._userJail, ip) != -1;
+        return _.indexOf(this._userJail, ip) !== -1;
     }
 
     /**
@@ -257,8 +257,6 @@ class Local extends Core {
      * @param userIP {string}       User IP for auth
      */
     public addAttempt(accountID : string, userIP : string) : void {
-        super.addAttempt(accountID, userIP);
-
         // Check if user is not already banned and account locked
         if (this._userIsBanned(userIP) || (this._accountLockEnable && this._accountIsLocked(accountID))) {
             return;
@@ -347,7 +345,7 @@ class Local extends Core {
      * @return {boolean}        Return true if IP is added or false is she's already in DB
      */
     public allowIP(ip : string) : boolean {
-        if (_.indexOf(this._IPWhiteList, ip) == -1) {
+        if (_.indexOf(this._IPWhiteList, ip) === -1) {
             this._IPWhiteList.push(ip);
             return true;
         }
@@ -592,7 +590,7 @@ class Local extends Core {
         var userIndex : number = _.indexOf(this._userJail, ip);
 
         // Check if user in really in jail or not
-        if (userIndex != -1) {
+        if (userIndex !== -1) {
             delete (this._userJailInfo[ip]);
             this._userJail.splice(userIndex, 1);
 
@@ -608,7 +606,7 @@ class Local extends Core {
             }
 
             // Remove all attempt user from list
-            while (_.indexOf(this._userAttempts, ip) != -1) {
+            while (_.indexOf(this._userAttempts, ip) !== -1) {
                 var index : number = (_.indexOf(this._userAttempts, ip));
                 this._userAttempts.splice(index, 1);
             }
@@ -631,7 +629,7 @@ class Local extends Core {
         var accountIndex : number = _.indexOf(this._accountJail, accountID);
 
         // Check if account in really in jail or not
-        if (accountIndex != -1) {
+        if (accountIndex !== -1) {
             delete (this._accountJailInfo[accountID]);
             this._accountJail.splice(accountIndex, 1);
 
@@ -647,7 +645,7 @@ class Local extends Core {
             }
 
             // Remove all attempt account from list
-            while (_.indexOf(this._accountAttempts, accountID) != -1) {
+            while (_.indexOf(this._accountAttempts, accountID) !== -1) {
                 var index : number = (_.indexOf(this._accountAttempts, accountID));
                 this._accountAttempts.splice(index, 1);
             }

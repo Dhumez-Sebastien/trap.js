@@ -115,8 +115,8 @@ class Trap {
         //console.log('Trapjs :: Loading protocol : '+filename);
 
         // Load protocol from files
-        var protocol = require(__dirname+'/protocols/list/'+filename),
-            build = new protocol(this._jailConfiguration);
+        var Protocol = require(__dirname+'/protocols/list/'+filename),
+            build = new Protocol(this._jailConfiguration);
 
         // Add protocol in list
         this._protocols[build.getName()] = build;

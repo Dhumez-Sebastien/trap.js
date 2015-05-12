@@ -36,7 +36,7 @@ var Trap = (function () {
     };
     Trap.prototype._loadProtocol = function (filename) {
         //console.log('Trapjs :: Loading protocol : '+filename);
-        var protocol = require(__dirname + '/protocols/list/' + filename), build = new protocol(this._jailConfiguration);
+        var Protocol = require(__dirname + '/protocols/list/' + filename), build = new Protocol(this._jailConfiguration);
         this._protocols[build.getName()] = build;
         if (!this._protocolUsed && build.getName() === 'local') {
             this.useProtocol({ protocol: 'local' });

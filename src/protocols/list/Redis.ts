@@ -35,6 +35,17 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
     }
 
     /**
+     * Add a new connection attempt
+     * @method addAttempt
+     *
+     * @param accountID {string}    Account ID for auth
+     * @param userIP {string}       User IP for auth
+     */
+    public addAttempt(accountID:string, userIP:string):void {
+
+    }
+
+    /**
      * Add a new IP address in white list
      * @method allowIP
      *
@@ -43,6 +54,17 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
      */
     public allowIP(ip:string):boolean {
         return false;
+    }
+
+    /**
+     * Ban user manually
+     * @method banUser
+     *
+     * @param ip {string}       IP address of user
+     * @param time {number}     Optional ban time in seconds
+     */
+    public banUser(ip:string, time ?:number):void {
+
     }
 
     /**
@@ -80,7 +102,7 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
      *
      * @param cb {Function}                 Callback to get list of users
      */
-    public getAccounts(cb : (err : any, res : ILocalProtocolAccountPublic[]) => void) : void {
+    public getAccounts(cb:(err:any, res:ILocalProtocolAccountPublic[]) => void):void {
 
     }
 
@@ -90,7 +112,7 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
      *
      * @param cb {Function}                 Callback to get list of banned users
      */
-    public getBannedUsers(cb:(err:any, res:IUserJailInfoPublic[]) => void) : void {
+    public getBannedUsers(cb:(err:any, res:IUserJailInfoPublic[]) => void):void {
 
     }
 
@@ -111,6 +133,29 @@ class Redis extends Core implements Trapjs.Protocols.Redis {
      * @param cb {Function}                 Callback to get list of users
      */
     public getUsers(cb:(err:any, res:ILocalProtocolUserPublic[]) => void):void {
+
+    }
+
+    /**
+     * Lock account manually
+     * @method lockAccount
+     *
+     * @param accountID {string}    AccountID
+     * @param time {number}         Optional lock time in seconds
+     */
+    public lockAccount(accountID:string, time ?:number):void {
+
+    }
+
+    /**
+     * Check if user/account are allowed to auth
+     * @method loginAttempt
+     *
+     * @param accountID {string}    Account ID for auth
+     * @param userIP {string}       User IP for auth
+     * @param cb {function}         Callback
+     */
+    public loginAttempt(accountID:string, userIP:string, cb:(err ?:any) => void):void {
 
     }
 }

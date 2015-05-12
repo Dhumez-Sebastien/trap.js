@@ -30,7 +30,7 @@ var Local = (function (_super) {
         for (var i = 0, ls = this._userAttempts.length; i < ls; i++) {
             if (this._userList[this._userAttempts[i]].attempts[0].date < userFindTime) {
                 this._userList[this._userAttempts[i]].attempts.shift();
-                if (this._userList[this._userAttempts[i]].attempts.length == 0) {
+                if (this._userList[this._userAttempts[i]].attempts.length === 0) {
                     delete (this._userList[this._userAttempts[i]]);
                 }
                 this._userAttempts.shift();
@@ -42,34 +42,34 @@ var Local = (function (_super) {
             }
         }
         var accountFindTime = Date.now() - this._accountFindTime;
-        for (var i = 0, ls = this._accountAttempts.length; i < ls; i++) {
-            if (this._accountList[this._accountAttempts[i]].attempts[0].date < accountFindTime) {
-                this._accountList[this._accountAttempts[i]].attempts.shift();
-                if (this._accountList[this._accountAttempts[i]].attempts.length == 0) {
-                    delete (this._accountList[this._accountAttempts[i]]);
+        for (var j = 0, lx = this._accountAttempts.length; j < lx; j++) {
+            if (this._accountList[this._accountAttempts[j]].attempts[0].date < accountFindTime) {
+                this._accountList[this._accountAttempts[j]].attempts.shift();
+                if (this._accountList[this._accountAttempts[j]].attempts.length == 0) {
+                    delete (this._accountList[this._accountAttempts[j]]);
                 }
                 this._accountAttempts.shift();
-                ls--;
-                i--;
+                lx--;
+                j--;
             }
             else {
                 break;
             }
         }
-        for (var i = 0, ls = this._userJail.length; i < ls; i++) {
-            if (this._userJailInfo[this._userJail[i]].endBan < Date.now()) {
-                delete (this._userJailInfo[this._userJail[i]]);
-                this._userJail.splice(i, 1);
-                i--;
-                ls--;
+        for (var k = 0, ly = this._userJail.length; k < ly; k++) {
+            if (this._userJailInfo[this._userJail[k]].endBan < Date.now()) {
+                delete (this._userJailInfo[this._userJail[k]]);
+                this._userJail.splice(k, 1);
+                k--;
+                ly--;
             }
         }
-        for (var i = 0, ls = this._accountJail.length; i < ls; i++) {
-            if (this._accountJailInfo[this._accountJail[i]].endLock < Date.now()) {
-                delete (this._accountJailInfo[this._accountJail[i]]);
-                this._accountJail.splice(i, 1);
-                i--;
-                ls--;
+        for (var l = 0, lz = this._accountJail.length; l < lz; l++) {
+            if (this._accountJailInfo[this._accountJail[l]].endLock < Date.now()) {
+                delete (this._accountJailInfo[this._accountJail[l]]);
+                this._accountJail.splice(l, 1);
+                l--;
+                lz--;
             }
         }
     };
@@ -77,10 +77,9 @@ var Local = (function (_super) {
         return _.indexOf(this._IPWhiteList, ip) > -1;
     };
     Local.prototype._userIsBanned = function (ip) {
-        return _.indexOf(this._userJail, ip) != -1;
+        return _.indexOf(this._userJail, ip) !== -1;
     };
     Local.prototype.addAttempt = function (accountID, userIP) {
-        _super.prototype.addAttempt.call(this, accountID, userIP);
         if (this._userIsBanned(userIP) || (this._accountLockEnable && this._accountIsLocked(accountID))) {
             return;
         }
@@ -123,7 +122,7 @@ var Local = (function (_super) {
         }
     };
     Local.prototype.allowIP = function (ip) {
-        if (_.indexOf(this._IPWhiteList, ip) == -1) {
+        if (_.indexOf(this._IPWhiteList, ip) === -1) {
             this._IPWhiteList.push(ip);
             return true;
         }
@@ -230,7 +229,7 @@ var Local = (function (_super) {
     };
     Local.prototype.unbanUser = function (ip) {
         var userIndex = _.indexOf(this._userJail, ip);
-        if (userIndex != -1) {
+        if (userIndex !== -1) {
             delete (this._userJailInfo[ip]);
             this._userJail.splice(userIndex, 1);
             if (this._userList[ip]) {
@@ -239,7 +238,7 @@ var Local = (function (_super) {
                 }
                 delete (this._userList[ip]);
             }
-            while (_.indexOf(this._userAttempts, ip) != -1) {
+            while (_.indexOf(this._userAttempts, ip) !== -1) {
                 var index = (_.indexOf(this._userAttempts, ip));
                 this._userAttempts.splice(index, 1);
             }
@@ -250,7 +249,7 @@ var Local = (function (_super) {
             return;
         }
         var accountIndex = _.indexOf(this._accountJail, accountID);
-        if (accountIndex != -1) {
+        if (accountIndex !== -1) {
             delete (this._accountJailInfo[accountID]);
             this._accountJail.splice(accountIndex, 1);
             if (this._accountList[accountID]) {
@@ -259,7 +258,7 @@ var Local = (function (_super) {
                 }
                 delete (this._accountList[accountID]);
             }
-            while (_.indexOf(this._accountAttempts, accountID) != -1) {
+            while (_.indexOf(this._accountAttempts, accountID) !== -1) {
                 var index = (_.indexOf(this._accountAttempts, accountID));
                 this._accountAttempts.splice(index, 1);
             }

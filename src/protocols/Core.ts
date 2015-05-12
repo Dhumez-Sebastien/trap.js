@@ -87,7 +87,7 @@ class Core {
         if (jailConfig) {
             // Account
             this._accountFindTime = (jailConfig.accountFindTime) ? jailConfig.accountFindTime : 3600 * 1000;
-            this._accountLockEnable = (jailConfig.accountLockEnable == true);
+            this._accountLockEnable = (jailConfig.accountLockEnable === true);
             this._accountLockTime = (jailConfig.accountLockTime) ? jailConfig.accountLockTime : 600 * 1000;
             this._accountMaxRetry = (jailConfig.accountMaxRetry) ? jailConfig.accountMaxRetry : 15;
 
@@ -96,38 +96,6 @@ class Core {
             this._userBanTime = (jailConfig.userBanTime) ? jailConfig.userBanTime : 7200 * 1000;
             this._userMaxRetry = (jailConfig.userMaxRetry) ? jailConfig.userMaxRetry : 10;
         }
-    }
-
-    /**
-     * Add a new connection attempt
-     * @method addAttempt
-     *
-     * @param accountID {string}    Account ID for auth
-     * @param userIP {string}       User IP for auth
-     */
-    public addAttempt(accountID : string, userIP : string) : void {
-
-    }
-
-    /**
-     * Add a new IP address in white list
-     * @method allowIP
-     *
-     * @param ip {string}       IP address of user allowed
-     */
-    public allowIP(ip : string) : void {
-
-    }
-
-    /**
-     * Ban user manually
-     * @method banUser
-     *
-     * @param ip {string}       IP address of user
-     * @param time {number}     Optional ban time in seconds
-     */
-    public banUser(ip : string, time ?: number) : void {
-
     }
 
     /**
@@ -152,7 +120,7 @@ class Core {
                 this._accountFindTime = jailConfig.accountFindTime * 1000;
             }
 
-            if (jailConfig.accountLockEnable != void 0) {
+            if (jailConfig.accountLockEnable !== void 0) {
                 this._accountLockEnable = !!jailConfig.accountLockEnable;
             }
 
@@ -188,32 +156,15 @@ class Core {
     public getName() : string {
         return this._protocolName;
     }
-
-    /**
-     * Lock account manually
-     * @method lockAccount
-     *
-     * @param accountID {string}    AccountID
-     * @param time {number}         Optional lock time in seconds
-     */
-    public lockAccount(accountID : string, time ?: number) : void {
-
-    }
-
-    public loginAttempt(accountID : string, userIP : string, cb : (err ?: any) => void) : void {
-
-    }
-
     /**
      * Unban user manually
      * @method unbanUser
      *
-     * @param userIP {string}       IP of user who must be unbanned
+     * @param ip {string}       IP of user who must be unbanned
      */
-    public unbanUser(userIP : string) : void {
+    public unbanUser(ip : string) : void {
 
     }
-
     /**
      * Unlock account manually
      * @method unlockAccount

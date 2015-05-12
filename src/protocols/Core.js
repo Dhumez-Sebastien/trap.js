@@ -5,7 +5,7 @@ var Core = (function () {
         this._accountLockEnable = true;
         if (jailConfig) {
             this._accountFindTime = (jailConfig.accountFindTime) ? jailConfig.accountFindTime : 3600 * 1000;
-            this._accountLockEnable = (jailConfig.accountLockEnable == true);
+            this._accountLockEnable = (jailConfig.accountLockEnable === true);
             this._accountLockTime = (jailConfig.accountLockTime) ? jailConfig.accountLockTime : 600 * 1000;
             this._accountMaxRetry = (jailConfig.accountMaxRetry) ? jailConfig.accountMaxRetry : 15;
             this._userFindTime = (jailConfig.userFindTime) ? jailConfig.userFindTime : 3600 * 1000;
@@ -13,12 +13,6 @@ var Core = (function () {
             this._userMaxRetry = (jailConfig.userMaxRetry) ? jailConfig.userMaxRetry : 10;
         }
     }
-    Core.prototype.addAttempt = function (accountID, userIP) {
-    };
-    Core.prototype.allowIP = function (ip) {
-    };
-    Core.prototype.banUser = function (ip, time) {
-    };
     Core.prototype.boot = function (protocolConfig, cb) {
         cb();
     };
@@ -27,7 +21,7 @@ var Core = (function () {
             if (jailConfig.accountFindTime) {
                 this._accountFindTime = jailConfig.accountFindTime * 1000;
             }
-            if (jailConfig.accountLockEnable != void 0) {
+            if (jailConfig.accountLockEnable !== void 0) {
                 this._accountLockEnable = !!jailConfig.accountLockEnable;
             }
             if (jailConfig.accountLockTime) {
@@ -50,11 +44,7 @@ var Core = (function () {
     Core.prototype.getName = function () {
         return this._protocolName;
     };
-    Core.prototype.lockAccount = function (accountID, time) {
-    };
-    Core.prototype.loginAttempt = function (accountID, userIP, cb) {
-    };
-    Core.prototype.unbanUser = function (userIP) {
+    Core.prototype.unbanUser = function (ip) {
     };
     Core.prototype.unlockAccount = function (accountID) {
     };
