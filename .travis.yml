@@ -23,7 +23,8 @@ before_script:
     - sh -e /etc/init.d/xvfb start
 
 script:
-    - npm run test:cov
+    - npm test
+    - npm run coverage
 
 after_script:
-    - codeclimate < lcov.info
+    - codeclimate < coverage/lcov.info
