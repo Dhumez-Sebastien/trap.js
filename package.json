@@ -15,7 +15,8 @@
   "author": "Dhumez Sebastien <sebastien.dhumez@gmail.com>",
   "main": "./src/Trap.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "testcov": "node ./node_modules/istanbul/lib/cli.js cover --preserve-comments ./node_modules/mocha/bin/_mocha -- -R spec"
   },
   "repository": {
     "type": "git",
