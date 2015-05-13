@@ -2,9 +2,6 @@ language: node_js
 node_js:
     - "0.12"
 
-script:
-- npm run test:cov
-
 branches:
     only:
         - master
@@ -26,4 +23,7 @@ before_script:
     - sh -e /etc/init.d/xvfb start
 
 script:
-    - npm test
+    - npm run test:cov
+
+after_script:
+    - codeclimate < lcov.info
